@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{%block title%}
+My Family Bank
+{%endblock%}
+
+{% block body %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Full Name</th>
+      <th>Age</th>
+      <th>Gender</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <th>{{user["id"]}}</th>
+      <td>{{user["fullName"]}}</td>
+      <td>{{user["age"]}}</td>
+      <td>
+        {% if user["gender"] == "M" %}
+        Maschio
+        {% else %}{% if user["gender"] == "F" %}
+        Femmina
+        {% else %}
+        Non Specificato
+        {% endif %}
+        {% endif %}
+      </td>
+      <td>
+        <i class="bi bi-pencil"></i>
+        <i class="bi bi-trash3"></i>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
