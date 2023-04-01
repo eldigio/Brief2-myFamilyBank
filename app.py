@@ -1,67 +1,99 @@
-from flask import Flask, request, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask import Flask, request, jsonify, render_template, redirect, session, sessions
+from werkzeug.security import check_password_hash
+from mysql.connector import connect
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.config["JWT_SECRET_KEY"] = "pluto"
-jwt = JWTManager(app)
-
-db = SQLAlchemy()
 app.config["SECRET_KEY"] = "pippo"
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:ElDiGio2003!?@localhost/MyFamilyBank'
-db.init_app(app)
+
+config = {
+    "host": "containers-us-west-160.railway.app",
+    "user": "root",
+    "passwd": "wT7iWjGdt4EJyy1yTWIu",
+    "database": "railway",
+    "port": "8016"
+}
 
 
 @app.get("/")
 def index():
+    if session.get("logged_in"):
+        return redirect("/dashboard")
     return render_template("index.html")
+
+
+@app.get("/sign-up")
+def get_sign_up():
+    return render_template("sign-up.html")
 
 
 @app.get("/login")
 def get_login():
-    return render_template("login.html")
+    if not session.get("logged_in"):
+        return render_template("login.html")
+    return redirect("/dashboard")
 
 
 @app.post("/login")
 def post_login():
+    conn = connect(**config)
+    cursor = conn.cursor(dictionary=True)
 
-    access = dict()
-    access_token = "acccesstoken"
+    email = request.form.get("email")
+    passwd = request.form.get("passwd")
 
-    access["access_token"] = access_token
+    query = f"SELECT * FROM users WHERE email=%s AND passwd=%s"
+    cursor.execute(query, (email, passwd))
+    user = cursor.fetchone()
 
-    return jsonify(access)
+    if request.form["email"] == user["email"] and request.form["passwd"] == user["passwd"]:
+        session["logged_in"] = True
+        session["full_name"] = {
+            "first_name": user["first_name"], "last_name": user["last_name"]
+        }
+        return redirect("/dashboard")
+
+    cursor.close()
+    conn.close()
+
+    return redirect("/login")
 
 
-@app.get("/api/all-users")
+@app.get("/logout")
+def logout():
+    session.pop("logged_in")
+    return redirect("/")
+
+
+@app.get("/dashboard")
+def dashboard():
+    if session.get("logged_in"):
+        return render_template("dashboard.html")
+    return redirect("/login")
+
+
+@app.get("/api/users")
 def get_all_users():
-    users = User.query.all()
+    conn = connect(**config)
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM users"
+
+    cursor.execute(query)
+    users = cursor.fetchall()
 
     all_users = dict()
 
     for user in users:
-        all_users[f"user {user.id}"] = {
-            "email": user.email, "password": user.passwd, "first_name": user.first_name, "last_name": user.last_name}
+        all_users[f"User {user['id']}"] = {
+            "email": user["email"], "passwd": user["passwd"], "first_name": user["first_name"], "last_name": user["last_name"]
+        }
+
+    cursor.close()
+    conn.close()
 
     return jsonify(all_users)
-
-# Models
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(32))
-    passwd = db.Column(db.String(255))
-    first_name = db.Column(db.String(32))
-    last_name = db.Column(db.String(32))
-
-    def __init__(self, email, passwd, first_name, last_name):
-        self.email = email
-        self.passwd = passwd
-        self.first_name = first_name
-        self.last_name = last_name
 
 
 if __name__ == "__main__":

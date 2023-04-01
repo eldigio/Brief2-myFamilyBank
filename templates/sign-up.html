@@ -34,27 +34,47 @@
     </nav>
 
     <div class="container">
-      <h2 class="text-center my-5">Login</h2>
+      <h2 class="text-center my-5">Sign Up</h2>
       <form action="/login" method="post">
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="floatingInputFirstName"
+            placeholder="first_name"
+            name="first_name"
+          />
+          <label for="floatingInputFirstName">First Name</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="floatingInputLastName"
+            placeholder="last_name"
+            name="last_name"
+          />
+          <label for="floatingInputLastName">Last Name</label>
+        </div>
         <div class="form-floating mb-3">
           <input
             type="email"
             class="form-control"
-            id="floatingInput"
+            id="floatingInputEmail"
             placeholder="email@example.com"
             name="email"
           />
-          <label for="floatingInput">Email address</label>
+          <label for="floatingInputEmail">Email address</label>
         </div>
         <div class="form-floating mb-4">
           <input
             type="password"
             class="form-control"
-            id="floatingPassword"
+            id="floatingInputPassword"
             placeholder="Password"
             name="passwd"
           />
-          <label for="floatingPassword">Password</label>
+          <label for="floatingInputPassword">Password</label>
         </div>
         <button type="submit" class="btn btn-primary btn-lg w-100">
           Login
