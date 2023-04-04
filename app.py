@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify, render_template, redirect, session, sessions
-from werkzeug.security import check_password_hash
+from flask import Flask, request, jsonify, render_template, redirect, session
+from pyargon2 import hash
 from mysql.connector import connect
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.config["SECRET_KEY"] = "pippo"
+app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
 config = {
     "host": "containers-us-west-160.railway.app",
@@ -25,7 +25,37 @@ def index():
 
 @app.get("/sign-up")
 def get_sign_up():
-    return render_template("sign-up.html")
+    if not session.get("logged_in"):
+        return render_template("sign-up.html")
+    return redirect("/dashboard")
+
+
+@app.post("/sign-up")
+def post_sign_up():
+    conn = connect(**config)
+    cursor = conn.cursor(dictionary=True)
+
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    email = request.form["email"]
+    passwd = request.form["passwd"]
+    hashed_passwd = hash(passwd, app.config["SECRET_KEY"])
+
+    cursor.execute("SELECT MAX(id) as max_id FROM users")
+    max_id = cursor.fetchone()
+    if max_id["max_id"] == None:
+        max_id["max_id"] = 0
+    cursor.execute(
+        "ALTER TABLE users AUTO_INCREMENT = {}".format(max_id["max_id"]))
+
+    query = "INSERT INTO users(email, passwd, first_name, last_name) VALUES (%s, %s, %s, %s)"
+    cursor.execute(query, (email, hashed_passwd, first_name, last_name))
+    cursor.execute("COMMIT")
+
+    cursor.close()
+    conn.close()
+
+    return redirect("/login")
 
 
 @app.get("/login")
@@ -40,17 +70,18 @@ def post_login():
     conn = connect(**config)
     cursor = conn.cursor(dictionary=True)
 
-    email = request.form.get("email")
-    passwd = request.form.get("passwd")
+    form_email = request.form.get("email")
+    form_passwd = request.form.get("passwd")
+    form_hashed_passwd = hash(form_passwd, app.config["SECRET_KEY"])
 
-    query = f"SELECT * FROM users WHERE email=%s AND passwd=%s"
-    cursor.execute(query, (email, passwd))
+    query = "SELECT * FROM users WHERE email=%s AND passwd=%s"
+    cursor.execute(query, (form_email, form_hashed_passwd))
     user = cursor.fetchone()
 
-    if request.form["email"] == user["email"] and request.form["passwd"] == user["passwd"]:
+    if form_email == user["email"] and form_hashed_passwd == user["passwd"]:
         session["logged_in"] = True
-        session["full_name"] = {
-            "first_name": user["first_name"], "last_name": user["last_name"]
+        session["name"] = {
+            "first": user["first_name"], "last": user["last_name"]
         }
         return redirect("/dashboard")
 
