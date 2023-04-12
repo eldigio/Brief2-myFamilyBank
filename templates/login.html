@@ -34,18 +34,30 @@
 
     <div class="container">
       <h2 class="text-center my-5">Login</h2>
-      <form action="/login" method="post">
+      <form action="/login" method="post" novalidate>
         <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="floatingInput" placeholder="email@example.com" name="email" />
+          <input
+            type="email"
+            class="form-control"
+            id="floatingInput"
+            placeholder="email@example.com"
+            name="email"
+            required />
           <label for="floatingInput">Email address</label>
         </div>
         <div class="form-floating mb-4">
-          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="passwd" />
+          <input
+            type="password"
+            class="form-control"
+            id="floatingPassword"
+            placeholder="Password"
+            name="passwd"
+            required />
           <label for="floatingPassword">Password</label>
         </div>
         <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
       </form>
     </div>
-    <script src="../static/login.js"></script>
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
   </body>
 </html>

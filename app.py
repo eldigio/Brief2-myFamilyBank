@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session
+from flask import Flask, request, jsonify, render_template, redirect, session, url_for
 from pyargon2 import hash
 from mysql.connector import connect
 
@@ -8,11 +8,11 @@ app.config["DEBUG"] = True
 app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
 config = {
-    "host": "containers-us-west-160.railway.app",
-    "user": "root",
-    "passwd": "wT7iWjGdt4EJyy1yTWIu",
-    "database": "railway",
-    "port": "8016"
+    "host": "aws.connect.psdb.cloud",
+    "user": "drrya9wk8n44gfufeyhd",
+    "passwd": "pscale_pw_X9n9FzEwp1MMAQM53PrIjpTHYY7JjYDBqVlLElGoypI",
+    "database": "myfamilybank",
+    "port": "3306"
 }
 
 
@@ -40,6 +40,10 @@ def post_sign_up():
     email = request.form["email"]
     passwd = request.form["passwd"]
     hashed_passwd = hash(passwd, app.config["SECRET_KEY"])
+    family_role = request.form["family_role"]
+    family_name = request.form["family_name"]
+    print(family_role)
+    print(family_name)
 
     cursor.execute("SELECT MAX(id) as max_id FROM users")
     max_id = cursor.fetchone()
@@ -48,8 +52,9 @@ def post_sign_up():
     cursor.execute(
         "ALTER TABLE users AUTO_INCREMENT = {}".format(max_id["max_id"]))
 
-    query = "INSERT INTO users(email, passwd, first_name, last_name) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query, (email, hashed_passwd, first_name, last_name))
+    query = "INSERT INTO users (email, passwd, first_name, last_name, family_role, family_name) VALUES (%s, %s, %s, %s, %s, %s)"
+    cursor.execute(query, (email, hashed_passwd, first_name,
+                   last_name, family_role, family_name))
     cursor.execute("COMMIT")
 
     cursor.close()
@@ -83,6 +88,8 @@ def post_login():
         session["name"] = {
             "first": user["first_name"], "last": user["last_name"]
         }
+        session["family"] = {"role": user["family_role"],
+                             "name": user["family_name"]}
         return redirect("/dashboard")
 
     cursor.close()
@@ -100,6 +107,7 @@ def logout():
 @app.get("/dashboard")
 def dashboard():
     if session.get("logged_in"):
+        print(session)
         return render_template("dashboard.html")
     return redirect("/login")
 
