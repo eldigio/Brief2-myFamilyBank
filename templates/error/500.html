@@ -18,6 +18,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <!-- user.is_authenticated -->
       <div class="container">
         <a href="/" class="navbar-brand">Home</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bt-target="#navbar">
@@ -32,38 +33,6 @@
       </div>
     </nav>
 
-    <div class="container">
-      <h2 class="text-center my-5">Login</h2>
-      <form action="/login" method="post" novalidate>
-        <!-- email -->
-        <div class="form-floating mb-3" id="email">
-          <input
-            type="email"
-            class="form-control"
-            id="floatingEmail"
-            placeholder="email@example.com"
-            name="email"
-            autocomplete="off"
-            required />
-          <label for="floatingEmail">Email address</label>
-          <div class="invalid-feedback"></div>
-        </div>
-        <!-- password -->
-        <div class="form-floating mb-4" id="password">
-          <input
-            type="password"
-            class="form-control"
-            id="floatingPassword"
-            placeholder="Password"
-            name="passwd"
-            required
-            data-tippi-content="tooltip" />
-          <label for="floatingPassword">Password</label>
-          <div class="invalid-feedback password"></div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-lg w-100" id="login">Login</button>
-      </form>
-    </div>
-    <script src="{{ url_for('static', filename='login.js') }}" type="module"></script>
+    <div class="container"><h1 class="text-center my-5">500, Internal Server Error</h1></div>
   </body>
 </html>

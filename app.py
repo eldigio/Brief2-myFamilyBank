@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session, url_for
+from flask import Flask, request, jsonify, render_template, redirect, session, url_for, abort
 from pyargon2 import hash
 from mysql.connector import connect
 
@@ -79,6 +79,9 @@ def post_login():
     form_passwd = request.form.get("passwd")
     form_hashed_passwd = hash(form_passwd, app.config["SECRET_KEY"])
 
+    if form_email == "" or form_passwd == "":
+        abort(500)
+
     query = "SELECT * FROM users WHERE email=%s AND passwd=%s"
     cursor.execute(query, (form_email, form_hashed_passwd))
     user = cursor.fetchone()
@@ -133,6 +136,16 @@ def get_all_users():
     conn.close()
 
     return jsonify(all_users)
+
+
+@app.get("/500")
+def error_500():
+    return render_template("error/500.html")
+
+
+@app.errorhandler(500)
+def handle_500(e):
+    return redirect("/500"), 500
 
 
 if __name__ == "__main__":

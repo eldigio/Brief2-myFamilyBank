@@ -37,41 +37,53 @@
       <form action="/sign-up" method="post" class="w-75 mx-auto">
         <div class="mb-3 d-flex column-gap-3">
           <!-- first name -->
-          <div class="form-floating w-50">
+          <div class="form-floating w-50" id="firstName">
             <input type="text" class="form-control" name="first_name" placeholder="firstName" />
             <label>First Name</label>
+            <div class="invalid-feedback"></div>
           </div>
           <!-- last name -->
-          <div class="form-floating w-50">
+          <div class="form-floating w-50" id="lastName">
             <input type="text" class="form-control" name="last_name" placeholder="lastName" />
             <label>Last Name</label>
+            <div class="invalid-feedback"></div>
           </div>
         </div>
         <!-- email -->
-        <div class="form-floating mb-3">
-          <input type="email" class="form-control" placeholder="email@example.com" name="email" />
+        <div class="form-floating mb-3" id="email">
+          <input
+            type="email"
+            class="form-control"
+            placeholder="email@example.com"
+            name="email"
+            autocomplete="off"
+            required />
           <label>Email address</label>
+          <div class="invalid-feedback"></div>
         </div>
         <!-- password -->
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-3" id="password">
           <input type="password" class="form-control" placeholder="Password" name="passwd" />
           <label>Password</label>
+          <div class="invalid-feedback"></div>
         </div>
-        <!-- select -->
-        <div class="form-floating mb-4">
+        <!-- family role -->
+        <div class="form-floating mb-4" id="familyRole">
           <select name="family_role" class="form-select">
             <option value="head">Capo Famiglia</option>
             <option value="member">Familiare</option>
           </select>
           <label>Ruolo Familiare</label>
         </div>
-        <div class="form-floating mb-3">
+        <!-- family name -->
+        <div class="form-floating mb-3" id="familyName">
           <input type="text" class="form-control" placeholder="family_name" name="family_name" />
           <label>Family Name</label>
+          <div class="invalid-feedback"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-lg w-100">Sign Up</button>
       </form>
     </div>
-    <script src="../static/login.js"></script>
+    <script src="{{ url_for('static', filename='signUp.js') }}" type="module"></script>
   </body>
 </html>
