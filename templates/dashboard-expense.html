@@ -41,18 +41,23 @@
     </nav>
 
     <div class="container">
-      <h1 class="text-center my-5">Dashboard</h1>
-      <div class="row gap-5 align-items-center border border-warning" style="min-height: 75vh">
-        <div class="col border border-danger">
-          <canvas id="chart"></canvas>
+      <h2 class="text-center my-5">Insert Expanse</h2>
+      <form action="/dashboard/expense" method="post" novalidate>
+        <!-- amount -->
+        <div class="form-floating mb-3" id="amount">
+          <input type="text" class="form-control" id="floatingNumber" placeholder="000" name="amount" required />
+          <label for="floatingNumber">Expense Amount</label>
+          <div class="invalid-feedback"></div>
         </div>
-        <div class="col-2 border border-danger">
-          <canvas id="chartPie"></canvas>
+        <!-- date -->
+        <div class="form-floating mb-4" id="date">
+          <input type="date" class="form-control" id="floatingDate" placeholder="Date" name="date" required />
+          <label for="floatingDate">Expense Date</label>
+          <div class="invalid-feedback"></div>
         </div>
-      </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100" id="dashboard/expense">Sumbit</button>
+      </form>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='dashboard.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='dashboard-expense.js') }}" type="module"></script>
   </body>
 </html>

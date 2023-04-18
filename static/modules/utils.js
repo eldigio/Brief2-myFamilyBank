@@ -114,3 +114,91 @@ export const validateFamilyName = (familyNameContainer) => {
     validInput(familyName);
   });
 };
+
+export const validateAmount = (amount, invalidFeedback) => {
+  if (amount.value === "") {
+    defaultInput(amount);
+    return;
+  }
+  if (amount.value.match(/[a-z]/i)) {
+    invalidInput(amount, invalidFeedback, "Cannot contain letters");
+    return false;
+  }
+  if (amount.value.length > 8) {
+    invalidInput(amount, invalidFeedback, "Expense must be less than 8 digits");
+    return false;
+  }
+  validInput(amount);
+  return true;
+};
+
+export const barChartConfig = {
+  type: "bar",
+  data: {
+    labels: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
+    datasets: [
+      {
+        label: "Mario",
+        data: [10, 0, 50, 100, 0, 0, 80],
+        borderRadius: 5,
+        backgroundColor: "blue",
+      },
+      {
+        label: "Maria",
+        data: [0, 50, 10, 0, 0, 30, 50, 0, 0, 0, 80, 90],
+        borderRadius: 5,
+        backgroundColor: "red",
+      },
+      {
+        label: "Pippo",
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50],
+        borderRadius: 5,
+        backgroundColor: "yellow",
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    aspectRatio: 0.5,
+  },
+};
+
+export const pieChartConfig = {
+  type: "pie",
+  data: {
+    labels: ["1", "2"],
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: [15, 1, 80, 55, 2, 33, 8],
+        borderColor: "Red",
+        backgroundColor: "Red",
+      },
+      {
+        label: "Dataset 2",
+        data: [15, 1, 80, 55, 2, 33, 8],
+        borderColor: "Blue",
+        backgroundColor: "Blue",
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    aspectRatio: 1,
+  },
+};

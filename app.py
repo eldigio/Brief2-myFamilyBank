@@ -9,8 +9,8 @@ app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
 config = {
     "host": "aws.connect.psdb.cloud",
-    "user": "drrya9wk8n44gfufeyhd",
-    "passwd": "pscale_pw_X9n9FzEwp1MMAQM53PrIjpTHYY7JjYDBqVlLElGoypI",
+    "user": "tixuvo7ipyhdg0yz85rq",
+    "passwd": "pscale_pw_Dpp3qW4QEcuPRoObRz9MVt0nUNGymfHMYWvTH8IDLMd",
     "database": "myfamilybank",
     "port": "3306"
 }
@@ -35,15 +35,13 @@ def post_sign_up():
     conn = connect(**config)
     cursor = conn.cursor(dictionary=True)
 
-    first_name = request.form["first_name"]
-    last_name = request.form["last_name"]
     email = request.form["email"]
     passwd = request.form["passwd"]
     hashed_passwd = hash(passwd, app.config["SECRET_KEY"])
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
     family_role = request.form["family_role"]
     family_name = request.form["family_name"]
-    print(family_role)
-    print(family_name)
 
     cursor.execute("SELECT MAX(id) as max_id FROM users")
     max_id = cursor.fetchone()
@@ -52,9 +50,8 @@ def post_sign_up():
     cursor.execute(
         "ALTER TABLE users AUTO_INCREMENT = {}".format(max_id["max_id"]))
 
-    query = "INSERT INTO users (email, passwd, first_name, last_name, family_role, family_name) VALUES (%s, %s, %s, %s, %s, %s)"
-    cursor.execute(query, (email, hashed_passwd, first_name,
-                   last_name, family_role, family_name))
+    cursor.execute("INSERT INTO users (email, passwd, firstName, lastName, familyName) VALUES (%s, %s, %s, %s, %s);",
+                   (email, hashed_passwd, first_name, last_name, family_name))
     cursor.execute("COMMIT")
 
     cursor.close()
@@ -82,17 +79,16 @@ def post_login():
     if form_email == "" or form_passwd == "":
         abort(500)
 
-    query = "SELECT * FROM users WHERE email=%s AND passwd=%s"
-    cursor.execute(query, (form_email, form_hashed_passwd))
+    cursor.execute("SELECT * FROM users WHERE email=%s AND passwd=%s",
+                   (form_email, form_hashed_passwd))
     user = cursor.fetchone()
 
     if form_email == user["email"] and form_hashed_passwd == user["passwd"]:
         session["logged_in"] = True
-        session["name"] = {
-            "first": user["first_name"], "last": user["last_name"]
-        }
-        session["family"] = {"role": user["family_role"],
-                             "name": user["family_name"]}
+        session["firstName"] = user["firstName"]
+        session["lastName"] = user["lastName"]
+        session["family"] = {"role": user["familyRole"],
+                             "name": user["familyName"]}
         return redirect("/dashboard")
 
     cursor.close()
@@ -110,8 +106,14 @@ def logout():
 @app.get("/dashboard")
 def dashboard():
     if session.get("logged_in"):
-        print(session)
         return render_template("dashboard.html")
+    return redirect("/login")
+
+
+@app.get("/dashboard/expense")
+def dashboard_expense():
+    if session.get("logged_in"):
+        return render_template("dashboard-expense.html")
     return redirect("/login")
 
 
@@ -129,7 +131,7 @@ def get_all_users():
 
     for user in users:
         all_users[f"User {user['id']}"] = {
-            "email": user["email"], "passwd": user["passwd"], "first_name": user["first_name"], "last_name": user["last_name"]
+            "email": user["email"], "passwd": user["passwd"], "first_name": user["firstName"], "last_name": user["lastName"]
         }
 
     cursor.close()
