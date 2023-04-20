@@ -3,6 +3,8 @@ export const getAllUsers = async () => {
   console.log(data);
 };
 
+export const sleep = (seconds) => new Promise((r) => setTimeout(r, seconds * 1000));
+
 export const emailRegex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
 export const defaultInput = (input) => {
@@ -21,98 +23,68 @@ export const validInput = (input) => {
   input.classList.add("is-valid");
 };
 
-export const validateInputs = (form) => {};
-
-export const validateEmail = (emailContainer) => {
-  emailContainer.addEventListener("input", (e) => {
-    const invalidFeedback = emailContainer.querySelector(".invalid-feedback");
-    const email = e.target;
-
-    if (email.value === "") {
-      defaultInput(email);
-      return;
-    }
-    if (!email.value.match(emailRegex)) {
-      invalidInput(email, invalidFeedback, "Invalid Email Address");
-      return;
-    }
-    validInput(email);
-  });
+export const validName = (name, invalidFeedback) => {
+  if (name.value.match(/[0-9]/)) {
+    invalidInput(name, invalidFeedback, "Cannot contain numbers");
+    return false;
+  }
+  return true;
 };
 
-export const validatePassword = (passwordContainer) => {
-  passwordContainer.addEventListener("input", (e) => {
-    const invalidFeedback = passwordContainer.querySelector(".invalid-feedback");
-    const password = e.target;
-
-    if (password.value === "") {
-      defaultInput(password);
-      return;
-    }
-    if (password.value.length < 8) {
-      invalidInput(password, invalidFeedback, "Password must be more than 8 characters");
-      return;
-    }
-    if (password.value.length > 16) {
-      invalidInput(password, invalidFeedback, "Password must be less than 128 characters");
-      return;
-    }
-    if (!password.value.match(/[a-z]/)) {
-      invalidInput(password, invalidFeedback, "Password must contain a lowercase character");
-      return;
-    }
-    if (!password.value.match(/[A-Z]/)) {
-      invalidInput(password, invalidFeedback, "Password must contain a uppercase character");
-      return;
-    }
-    if (!password.value.match(/[0-9]/)) {
-      invalidInput(password, invalidFeedback, "Password must contain a number");
-      return;
-    }
-    if (!password.value.match(/(?![a-z0-9])\S/gi)) {
-      invalidInput(password, invalidFeedback, "Password must contain a special character");
-      return;
-    }
-    validInput(password);
-  });
+export const isEmpty = (input) => {
+  if (input.value === "") {
+    defaultInput(input);
+    return true;
+  }
+  return false;
 };
 
-export const validateName = (nameContainer) => {
-  nameContainer.addEventListener("input", (e) => {
-    const invalidFeedback = nameContainer.querySelector(".invalid-feedback");
-    const name = e.target;
-
-    if (name.value === "") {
-      defaultInput(name);
-      return;
-    }
-    if (name.value.match(/[0-9]/)) {
-      invalidInput(name, invalidFeedback, "Cannot contain numbers");
-      return;
-    }
-    validInput(name);
-  });
+export const validEmail = (email, invalidFeedback) => {
+  if (!email.value.match(emailRegex)) {
+    invalidInput(email, invalidFeedback, "Invalid Email Address");
+    return false;
+  }
+  return true;
 };
 
-export const validateFamilyName = (familyNameContainer) => {
-  familyNameContainer.addEventListener("input", (e) => {
-    const invalidFeedback = familyNameContainer.querySelector(".invalid-feedback");
-    const familyName = e.target;
+export const validPassword = (password, invalidFeedback) => {
+  if (password.value.length < 8) {
+    invalidInput(password, invalidFeedback, "Password must be more than 8 characters");
+    return false;
+  }
+  if (password.value.length > 128) {
+    invalidInput(password, invalidFeedback, "Password must be less than 128 characters");
+    return false;
+  }
+  if (!password.value.match(/[a-z]/)) {
+    invalidInput(password, invalidFeedback, "Password must contain a lowercase character");
+    return false;
+  }
+  if (!password.value.match(/[A-Z]/)) {
+    invalidInput(password, invalidFeedback, "Password must contain a uppercase character");
+    return false;
+  }
+  if (!password.value.match(/[0-9]/)) {
+    invalidInput(password, invalidFeedback, "Password must contain a number");
+    return false;
+  }
+  if (!password.value.match(/(?![a-z0-9])\S/gi)) {
+    invalidInput(password, invalidFeedback, "Password must contain a special character");
+    return false;
+  }
+  return true;
+};
 
-    if (familyName.value === "") {
-      defaultInput(familyName);
-      return;
-    }
-    if (familyName.value.length < 4) {
-      invalidInput(familyName, invalidFeedback, "Family name must be more than 4 characters");
-      return;
-    }
-    if (familyName.value.length > 16) {
-      invalidInput(familyName, invalidFeedback, "Family name must be less than 16 characters");
-      return;
-    }
-    validInput(familyName);
-  });
+export const validFamilyName = (familyName, invalidFeedback) => {
+  if (familyName.value.length < 4) {
+    invalidInput(familyName, invalidFeedback, "Family name must be more than 4 characters");
+    return false;
+  }
+  if (familyName.value.length > 16) {
+    invalidInput(familyName, invalidFeedback, "Family name must be less than 16 characters");
+    return false;
+  }
+  return true;
 };
 
 export const validateAmount = (amount, invalidFeedback) => {
@@ -130,6 +102,27 @@ export const validateAmount = (amount, invalidFeedback) => {
   }
   validInput(amount);
   return true;
+};
+
+export const animateCSS = (element, animation, prefix = "animate__") => {
+  // We create a Promise and return it
+  new Promise((resolve, reject) => {
+    const animationName = `${prefix}${animation}`;
+    const node = document.querySelector(element);
+
+    node.classList.remove("d-none");
+    node.classList.add(`${prefix}animated`, animationName);
+
+    // When the animation ends, we clean the classes and resolve the Promise
+    function handleAnimationEnd(event) {
+      event.stopPropagation();
+      node.classList.remove(`${prefix}animated`, animationName);
+      if (animationName.includes("fadeOut")) node.classList.add("d-none");
+      resolve("Animation ended");
+    }
+
+    node.addEventListener("animationend", handleAnimationEnd, { once: true });
+  });
 };
 
 export const barChartConfig = {
