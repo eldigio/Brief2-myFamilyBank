@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 import {
   animateCSS,
@@ -9,53 +9,81 @@ import {
   validInput,
   validName,
   validPassword,
-} from "./modules/utils.js";
+} from './modules/utils.js';
 
-const form = document.querySelector("form");
-const firstNameContainer = document.querySelector("#firstName");
-const lastNameContainer = document.querySelector("#lastName");
-const emailContainer = document.querySelector("#email");
-const passwordContainer = document.querySelector("#password");
-const familyNameContainer = document.querySelector("#familyName");
+const form = document.querySelector('form');
+const firstNameContainer = document.querySelector('#firstName');
+const lastNameContainer = document.querySelector('#lastName');
+const emailContainer = document.querySelector('#email');
+const passwordContainer = document.querySelector('#password');
+const familyRoleContainer = document.querySelector('#familyRole');
+const familyNameContainer = document.querySelector('#familyName');
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  animateCSS("#alertDanger", "fadeIn");
-  await sleep(5);
-  animateCSS("#alertDanger", "fadeOut");
+const canSubmit = {
+  firstName: false,
+  lastName: false,
+  email: false,
+  password: false,
+  familyName: false,
+};
+
+form.addEventListener('submit', async (e) => {
+  if (
+    !canSubmit.firstName ||
+    !canSubmit.lastName ||
+    !canSubmit.email ||
+    !canSubmit.password ||
+    !canSubmit.familyName
+  ) {
+    e.preventDefault();
+    animateCSS('#alertDanger', 'fadeIn');
+    await sleep(5);
+    animateCSS('#alertDanger', 'fadeOut');
+  }
 });
 
-firstNameContainer.addEventListener("focusout", (e) => {
-  const invalidFeedback = firstNameContainer.querySelector(".invalid-feedback");
+firstNameContainer.addEventListener('input', (e) => {
+  const invalidFeedback = firstNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validName(e.target, invalidFeedback)) return;
   validInput(e.target);
+  canSubmit.firstName = true;
 });
 
-lastNameContainer.addEventListener("focusout", (e) => {
-  const invalidFeedback = lastNameContainer.querySelector(".invalid-feedback");
+lastNameContainer.addEventListener('input', (e) => {
+  const invalidFeedback = lastNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validName(e.target, invalidFeedback)) return;
   validInput(e.target);
+  canSubmit.lastName = true;
 });
 
-emailContainer.addEventListener("input", (e) => {
-  const invalidFeedback = lastNameContainer.querySelector(".invalid-feedback");
+emailContainer.addEventListener('input', (e) => {
+  const invalidFeedback = lastNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validEmail(e.target, invalidFeedback)) return;
   validInput(e.target);
+  canSubmit.email = true;
 });
 
-passwordContainer.addEventListener("focusout", (e) => {
-  const invalidFeedback = passwordContainer.querySelector(".invalid-feedback");
+passwordContainer.addEventListener('input', (e) => {
+  const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validPassword(e.target, invalidFeedback)) return;
   validInput(e.target);
 });
 
-familyNameContainer.addEventListener("focusout", (e) => {
-  const invalidFeedback = familyNameContainer.querySelector(".invalid-feedback");
+familyRoleContainer.addEventListener('change', (e) => {
+  const invalidFeedback =
+    familyRoleContainer.querySelector('.invalid-feedback');
+  console.log(e.target.value);
+});
+
+familyNameContainer.addEventListener('input', (e) => {
+  const invalidFeedback =
+    familyNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validFamilyName(e.target, invalidFeedback)) return;
   validInput(e.target);
+  canSubmit.familyName = true;
 });

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect, session, url_for, abort
-from pyargon2 import hash
+from passlib.hash import sha256_crypt
 from mysql.connector import connect
 
 app = Flask(__name__)
@@ -8,9 +8,9 @@ app.config["DEBUG"] = True
 app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
 config = {
-    "host": "aws.connect.psdb.cloud",
-    "user": "tixuvo7ipyhdg0yz85rq",
-    "passwd": "pscale_pw_Dpp3qW4QEcuPRoObRz9MVt0nUNGymfHMYWvTH8IDLMd",
+    "host": "localhost",
+    "user": "root",
+    "passwd": "root",
     "database": "myfamilybank",
     "port": "3306"
 }
@@ -37,21 +37,17 @@ def post_sign_up():
 
     email = request.form["email"]
     passwd = request.form["passwd"]
-    hashed_passwd = hash(passwd, app.config["SECRET_KEY"])
+    hashed_password = sha256_crypt.hash(passwd)
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
-    family_role = request.form["family_role"]
     family_name = request.form["family_name"]
+    family_role = request.form["family_role"]
 
-    cursor.execute("SELECT MAX(id) as max_id FROM users")
-    max_id = cursor.fetchone()
-    if max_id["max_id"] == None:
-        max_id["max_id"] = 0
-    cursor.execute(
-        "ALTER TABLE users AUTO_INCREMENT = {}".format(max_id["max_id"]))
+    if family_role == "head":
+        cursor.execute("SELECT ")
 
-    cursor.execute("INSERT INTO users (email, passwd, firstName, lastName, familyName) VALUES (%s, %s, %s, %s, %s);",
-                   (email, hashed_passwd, first_name, last_name, family_name))
+    cursor.execute("INSERT INTO users (email, passwd, firstName, lastName, familyId) VALUES (%s, %s, %s, %s, %s);",
+                   (email, hashed_password, first_name, last_name, family_name, family_role))
     cursor.execute("COMMIT")
 
     cursor.close()
