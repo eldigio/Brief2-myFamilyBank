@@ -1,16 +1,47 @@
-"use strict";
+'use strict';
 
-const emailContainer = document.querySelector("#email");
-const passwordContainer = document.querySelector("#password");
-const form = document.querySelector("form");
+import {
+  animateCSS,
+  isEmpty,
+  sleep,
+  validEmail,
+  validInput,
+  validPassword,
+} from './modules/utils.js';
 
-form.addEventListener("submit", (e) => {
-  const emailInput = form.children[0].children[0];
-  const passwordInput = form.children[1].children[0];
-  console.log(emailInput.value, passwordInput.value);
+gsap.from('nav', { duration: 3, opacity: 0 });
 
-  if (emailInput.value === "" || passwordInput.value === "") {
+const form = document.querySelector('form');
+const emailContainer = document.querySelector('#email');
+const passwordContainer = document.querySelector('#password');
+
+const canSubmit = {
+  email: false,
+  password: false,
+};
+
+form.addEventListener('submit', (e) => {
+  if (!canSubmit.email || !canSubmit.password) {
     e.preventDefault();
+    animateCSS('#alert-danger', 'fadeIn');
+    sleep(5);
+    animateCSS('#alert-danger', 'fadeOut');
     return;
   }
+});
+
+emailContainer.addEventListener('input', (e) => {
+  const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
+  if (isEmpty(e.target)) return;
+  if (!validEmail(e.target, invalidFeedback)) return;
+  validInput(e.target);
+  canSubmit.email = true;
+});
+
+passwordContainer.addEventListener('input', (e) => {
+  const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
+  if (isEmpty(e.target)) return;
+  if (!validPassword(e.target, invalidFeedback)) return;
+  validInput(e.target);
+  canSubmit.password = true;
 });

@@ -39,6 +39,7 @@ form.addEventListener('submit', async (e) => {
     animateCSS('#alertDanger', 'fadeIn');
     await sleep(5);
     animateCSS('#alertDanger', 'fadeOut');
+    return;
   }
 });
 
@@ -59,7 +60,7 @@ lastNameContainer.addEventListener('input', (e) => {
 });
 
 emailContainer.addEventListener('input', (e) => {
-  const invalidFeedback = lastNameContainer.querySelector('.invalid-feedback');
+  const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
   if (!validEmail(e.target, invalidFeedback)) return;
   validInput(e.target);
@@ -71,6 +72,7 @@ passwordContainer.addEventListener('input', (e) => {
   if (isEmpty(e.target)) return;
   if (!validPassword(e.target, invalidFeedback)) return;
   validInput(e.target);
+  canSubmit.password = true;
 });
 
 familyRoleContainer.addEventListener('change', (e) => {

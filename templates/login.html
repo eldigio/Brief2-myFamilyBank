@@ -16,6 +16,10 @@
       crossorigin="anonymous"
       defer
     ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"
+      defer
+    ></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -46,6 +50,14 @@
     <div class="container">
       <h2 class="text-center my-5">Login</h2>
       <form action="/login" method="post" novalidate>
+        <!-- alert -->
+        <div
+          class="alert alert-danger alert-dismissible d-none"
+          role="alert"
+          id="alertDanger"
+        >
+          Please fill out the form!
+        </div>
         <!-- email -->
         <div class="form-floating mb-3" id="email">
           <input
