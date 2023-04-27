@@ -7,7 +7,7 @@ app.config["DEBUG"] = True
 
 app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
-connection_string = "mongodb+srv://eldigio:eldigio69@myfamilybank.59d7nxl.mongodb.net"
+connection_string = "mongodb+srv://eldigio:eldigio69@myfamilybank.59d7nxl.mongodb.net/"
 client = MongoClient(connection_string)
 
 db = client.myfamilybank
@@ -107,29 +107,6 @@ def dashboard_expense():
     if session.get("logged_in"):
         return render_template("dashboard-expense.html")
     return redirect("/login")
-
-
-# @app.get("/api/users")
-# def get_all_users():
-#     conn = connect(**config)
-#     cursor = conn.cursor(dictionary=True)
-
-#     query = "SELECT * FROM users"
-
-#     cursor.execute(query)
-#     users = cursor.fetchall()
-
-#     all_users = dict()
-
-#     for user in users:
-#         all_users[f"User {user['id']}"] = {
-#             "email": user["email"], "passwd": user["passwd"], "first_name": user["firstName"], "last_name": user["lastName"]
-#         }
-
-#     cursor.close()
-#     conn.close()
-
-#     return jsonify(all_users)
 
 
 @app.get("/500")
