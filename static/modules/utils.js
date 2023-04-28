@@ -175,6 +175,12 @@ export const barChartOptions = {
         () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
       ),
     },
+    {
+      name: 'Member 3',
+      data: [...Array(10)].map(
+        () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      ),
+    },
   ],
   chart: {
     type: 'bar',
