@@ -1,10 +1,7 @@
-"use strict";
+'use strict';
 
-import { barChartConfig, pieChartConfig } from "./modules/utils.js";
+import { barChartOptions } from './modules/utils.js';
 
-const bar = document.querySelector("#chart");
-const pie = document.querySelector("#chartPie");
+const chart = new ApexCharts(document.querySelector('#chart'), barChartOptions);
 
-new Chart(bar, barChartConfig);
-
-new Chart(pie, pieChartConfig);
+chart.render();
