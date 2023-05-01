@@ -14,6 +14,7 @@
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
       defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -52,7 +53,7 @@
     </nav>
     <!-- Header -->
     <div class="container mb-4">
-      <h1 class="text-center my-4">Profile | Expense</h1>
+      <h1 class="text-center my-4">Profile</h1>
     </div>
     <!-- Main -->
     <div class="container">
@@ -60,77 +61,115 @@
         <!-- aside -->
         <div class="col-md-4 my-4">
           <div class="list-group mb-4">
-            <a href="/profile" class="list-group-item list-group-item-action">General</a>
+            <a href="/profile" class="list-group-item list-group-item-action active">General</a>
             <a href="/profile/family" class="list-group-item list-group-item-action">Family</a>
-            <a href="/profile/expense" class="list-group-item list-group-item-action active">Expense</a>
+            <a href="/profile/expense" class="list-group-item list-group-item-action">Expense</a>
           </div>
+          <button type="button" class="btn btn-secondary w-100" id="editProfile">Edit Profile</button>
         </div>
         <!-- main -->
         <div class="col-md-8 py-4">
-          <form action="/profile/expense" method="post" class="d-flex flex-column gap-3">
+          <form action="/profile" method="post" class="d-flex flex-column gap-3">
             <!-- alert -->
             <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
               Please fill out the form!
             </div>
-            <!-- amount -->
-            <div class="form-floating" id="amount">
-              <input
-                type="number"
-                class="form-control"
-                id="floatingAmount"
-                placeholder="amount"
-                name="amount"
-                autocomplete="off"
-                required />
-              <label for="floatingAmount">Expense Amount</label>
-              <div class="invalid-feedback"></div>
-            </div>
-            <!-- family/expense date -->
+            <!-- name -->
             <div class="row">
-              <!-- family name -->
-              <div class="col-md">
-                <div class="form-floating" id="familyName">
+              <!-- firstName -->
+              <div class="col-md d-flex column-gap-1">
+                <div class="form-floating w-100" id="firstName">
                   <input
                     type="text"
                     class="form-control"
-                    id="floatingFamilyName"
-                    placeholder="familyName"
-                    name="familyName"
+                    id="floatingFirstName"
+                    placeholder="firstName"
+                    name="firstName"
+                    value="{{session['firstName']}}"
+                    autocomplete="off"
+                    required
+                    disabled />
+                  <label for="floatingFirstName">First Name</label>
+                  <div class="invalid-feedback"></div>
+                </div>
+              </div>
+              <!-- lastName -->
+              <div class="col-md">
+                <div class="form-floating" id="lastName">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="floatingLastName"
+                    placeholder="lastName"
+                    name="lastName"
+                    value="{{session['lastName']}}"
+                    autocomplete="off"
+                    required
+                    disabled />
+                  <label for="floatingLastName">Last Name</label>
+                  <div class="invalid-feedback"></div>
+                </div>
+              </div>
+            </div>
+            <!-- email -->
+            <div class="form-floating" id="email">
+              <input
+                type="email"
+                class="form-control"
+                id="floatingEmail"
+                placeholder="email@example.com"
+                name="email"
+                value="{{session['email']}}"
+                autocomplete="off"
+                required
+                disabled />
+              <label for="floatingEmail">Email address</label>
+              <div class="invalid-feedback"></div>
+            </div>
+            <!-- family -->
+            <div class="row">
+              <!-- name -->
+              <div class="col-md">
+                <div class="form-floating" id="familyRole">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="floatingFamilyRole"
+                    placeholder="familyRole"
+                    name="familyRole"
                     value="{{session['family']['name']}}"
                     autocomplete="off"
                     required
                     disabled />
-                  <label for="floatingFamilyName">Family Name</label>
+                  <label for="floatingFamilyRole">Family Name</label>
                   <div class="invalid-feedback"></div>
                 </div>
               </div>
-              <!-- expense date -->
+              <!-- role -->
               <div class="col-md">
-                <div class="form-floating" id="expenseDate">
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="floatingExpenseDate"
-                    placeholder="expenseDate"
-                    name="date"
-                    required />
-                  <label for="floatingExpenseDate">Expense Date</label>
-                  <div class="invalid-feedback"></div>
-                </div>
+                <select class="form-select form-select-lg h-100" id="familyRole" name="familyRole" disabled>
+                  {% if session["family"]["role"] == "head" %}
+                  <option value="head" selected>Head</option>
+                  <option value="member">Member</option>
+                  {% else %}
+                  <option value="head">Head</option>
+                  <option value="member" selected>Member</option>
+                  {% endif %}
+                </select>
               </div>
             </div>
-            <!-- reset/submit -->
+            <!-- reset/delete -->
             <div class="d-flex justify-content-between mt-4" id="resetDelete">
-              <!-- reset -->
-              <button type="reset" class="btn btn-outline-secondary">Reset</button>
-              <!-- sumbit -->
-              <button type="submit" class="btn btn-outline-primary">Submit</button>
+              <!-- reset password -->
+              <a href="/profile/reset-password" class="btn btn-outline-warning">Reset Password</a>
+              <!-- delete account -->
+              <a href="/profile/delete" class="btn btn-outline-danger">Delete Account</a>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='dashboard-expense.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='profile.js') }}" type="module"></script>
   </body>
 </html>

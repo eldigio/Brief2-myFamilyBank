@@ -1,13 +1,17 @@
-export const getAllUsers = async () => {
-  const data = await (await fetch('api/users')).json();
-  console.log(data);
+export const sleep = (seconds) => new Promise((r) => setTimeout(r, seconds * 1000));
+
+export const emailRegex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+
+export const getSession = () => {
+  let session = {};
+  return (session = {
+    firstName: document.querySelector('[name="sessionFirstName"]').value,
+    lastName: document.querySelector('[name="sessionLastName"]').value,
+    email: document.querySelector('[name="sessionEmail"]').value,
+    familyName: document.querySelector('[name="sessionFamilyName"]').value,
+    familyRole: document.querySelector('[name="sessionFamilyRole"]').value,
+  });
 };
-
-export const sleep = (seconds) =>
-  new Promise((r) => setTimeout(r, seconds * 1000));
-
-export const emailRegex =
-  /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
 export const defaultInput = (input) => {
   input.classList.remove('is-valid');
@@ -51,35 +55,19 @@ export const validEmail = (email, invalidFeedback) => {
 
 export const validPassword = (password, invalidFeedback) => {
   if (password.value.length < 8) {
-    invalidInput(
-      password,
-      invalidFeedback,
-      'Password must be more than 8 characters'
-    );
+    invalidInput(password, invalidFeedback, 'Password must be more than 8 characters');
     return false;
   }
   if (password.value.length > 128) {
-    invalidInput(
-      password,
-      invalidFeedback,
-      'Password must be less than 128 characters'
-    );
+    invalidInput(password, invalidFeedback, 'Password must be less than 128 characters');
     return false;
   }
   if (!password.value.match(/[a-z]/)) {
-    invalidInput(
-      password,
-      invalidFeedback,
-      'Password must contain a lowercase character'
-    );
+    invalidInput(password, invalidFeedback, 'Password must contain a lowercase character');
     return false;
   }
   if (!password.value.match(/[A-Z]/)) {
-    invalidInput(
-      password,
-      invalidFeedback,
-      'Password must contain a uppercase character'
-    );
+    invalidInput(password, invalidFeedback, 'Password must contain a uppercase character');
     return false;
   }
   if (!password.value.match(/[0-9]/)) {
@@ -87,11 +75,7 @@ export const validPassword = (password, invalidFeedback) => {
     return false;
   }
   if (!password.value.match(/(?![a-z0-9])\S/gi)) {
-    invalidInput(
-      password,
-      invalidFeedback,
-      'Password must contain a special character'
-    );
+    invalidInput(password, invalidFeedback, 'Password must contain a special character');
     return false;
   }
   return true;
@@ -99,38 +83,13 @@ export const validPassword = (password, invalidFeedback) => {
 
 export const validFamilyName = (familyName, invalidFeedback) => {
   if (familyName.value.length < 4) {
-    invalidInput(
-      familyName,
-      invalidFeedback,
-      'Family name must be more than 4 characters'
-    );
+    invalidInput(familyName, invalidFeedback, 'Family name must be more than 4 characters');
     return false;
   }
   if (familyName.value.length > 16) {
-    invalidInput(
-      familyName,
-      invalidFeedback,
-      'Family name must be less than 16 characters'
-    );
+    invalidInput(familyName, invalidFeedback, 'Family name must be less than 16 characters');
     return false;
   }
-  return true;
-};
-
-export const validateAmount = (amount, invalidFeedback) => {
-  if (amount.value === '') {
-    defaultInput(amount);
-    return;
-  }
-  if (amount.value.match(/[a-z]/i)) {
-    invalidInput(amount, invalidFeedback, 'Cannot contain letters');
-    return false;
-  }
-  if (amount.value.length > 8) {
-    invalidInput(amount, invalidFeedback, 'Expense must be less than 8 digits');
-    return false;
-  }
-  validInput(amount);
   return true;
 };
 
@@ -155,53 +114,151 @@ export const animateCSS = (element, animation, prefix = 'animate__') => {
   });
 };
 
-export const barChartOptions = {
-  series: [
-    {
-      name: 'Head',
-      data: [...Array(10)].map(
-        () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
-      ),
-    },
-    {
-      name: 'Member 1',
-      data: [...Array(10)].map(
-        () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
-      ),
-    },
-    {
-      name: 'Member 2',
-      data: [...Array(10)].map(
-        () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
-      ),
-    },
-    {
-      name: 'Member 3',
-      data: [...Array(10)].map(
-        () => Math.floor(Math.random() * (100 - 1 + 1)) + 1
-      ),
-    },
-  ],
-  chart: {
-    type: 'bar',
-  },
-  xaxis: {
-    categories: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-    ],
-  },
-  tooltip: {
-    y: {
-      formatter: (val) => `€${val}`,
-    },
-  },
+export const toggleEditProfile = (btnEditProfile, resetDeleteContainer, end = false) => {
+  if (btnEditProfile.classList.contains('btn-secondary')) {
+    btnEditProfile.classList.replace('btn-secondary', 'btn-outline-secondary');
+    resetDeleteContainer.insertAdjacentHTML(
+      end ? 'beforeend' : 'afterbegin',
+      `<a href="/profile${end ? '/family' : ''}" class="btn btn-outline-primary">Save Changes</a>`
+    );
+  } else {
+    btnEditProfile.classList.replace('btn-outline-secondary', 'btn-secondary');
+    resetDeleteContainer.querySelector('.btn.btn-outline-primary').remove();
+  }
+};
+
+export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
+  const html = `
+    <form action="/profile/family" method="post" class="d-flex flex-column gap-3">
+      <!-- alert -->
+      <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
+        Please fill out the form!
+      </div>
+      <!-- name -->
+      <div class="row">
+        <!-- firstName -->
+        <div class="col-md">
+          <div class="form-floating d-flex" id="firstName">
+            <input type="text" class="form-control" id="floatingFirstName" placeholder="firstName"
+              name="firstName" value="${jsonData[key].first_name}" autocomplete="off" required disabled />
+            <label for="floatingFirstName">First Name</label>
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <!-- lastName -->
+        <div class="col-md">
+          <div class="form-floating d-flex align-items-center" id="lastName">
+            <input type="text" class="form-control" id="floatingLastName" placeholder="lastName"
+              name="lastName" value="${jsonData[key].last_name}" autocomplete="off" required disabled />
+            <label for="floatingLastName">Last Name</label>
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+      </div>
+      <!-- email -->
+      <div class="form-floating" id="email">
+        <input type="email" class="form-control" id="floatingEmail" placeholder="email@example.com"
+          name="email" value="${jsonData[key].email}" autocomplete="off" required disabled />
+        <label for="floatingEmail">Email address</label>
+        <div class="invalid-feedback"></div>
+      </div>
+      <!-- family -->
+      <div class="row">
+        <!-- name -->
+        <div class="col-md">
+          <div class="form-floating" id="familyName">
+            <input type="text" class="form-control" id="floatingFamilyName" placeholder="familyName"
+              name="familyName" value="${jsonData[key].family_name}" autocomplete="off" required disabled />
+            <label for="floatingFamilyName">Family Name</label>
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <!-- role -->
+        <div class="col-md">
+          <select class="form-select form-select-lg h-100" id="familyRole" name="familyRole" disabled>
+            <option value="head" ${jsonData[key].family_role === 'head' ? 'selected' : ''}>Head</option>
+            <option value="member" ${jsonData[key].family_role === 'member' ? 'selected' : ''}>Member</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    ${index !== jsonDataKeys.length - 1 ? `<div class="border my-4"></div>` : ``}
+`;
+  return html;
+};
+
+export const createWhitelist = (familyRole) => {
+  let whitelist = [];
+  if (familyRole === 'head') {
+    whitelist = ['firstName', 'lastName', 'email', 'familyRole'];
+  } else {
+    whitelist = ['firstName', 'lastName', 'email'];
+  }
+  return whitelist;
+};
+
+export const jsonToObject = (jsonData) => {
+  let data = [];
+  const jsonDataKeys = Object.keys(jsonData);
+  jsonDataKeys.forEach((key, index) => {
+    data.push({
+      amount: jsonData[key].amount,
+      date: jsonData[key].date,
+      familyName: jsonData[key].family_name,
+      firstName: jsonData[key].first_name,
+      lastName: jsonData[key].last_name,
+    });
+  });
+  return data;
+};
+
+export const getDayName = (dateString, locale = 'en-US') => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(locale, { weekday: 'long' });
+};
+
+export const getMonthName = (monthNumber) => {
+  const months = Array.from({ length: 12 }, (item, i) => {
+    return new Date(0, i).toLocaleString('en-US', { month: 'long' });
+  });
+  return months[monthNumber - 1];
+};
+
+export const getAllDaysInMonth = (year, month) => {
+  const numDaysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const daysIndex = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  let index = daysIndex[new Date(year, month - 1, 1).toString().split(' ')[0]];
+  let daysArray = [];
+
+  for (let i = 0, l = numDaysInMonth[month - 1]; i < l; i++) {
+    daysArray.push(daysInWeek[index++]);
+    if (index == 7) index = 0;
+  }
+
+  const daysArrayLength = daysArray.length;
+
+  const dayArray = Array.from({ length: daysArrayLength }, (_, i) => i + 1);
+
+  return dayArray;
+};
+
+export const getUsersChartDataset = (jsonData, sessionFirstName, sessionLastName, year, month) => {
+  const datasets = [];
+  jsonData.forEach((user, index) => {
+    datasets.push({ label: user.first_name, data: new Array(31).fill(0) });
+
+    // if (user.first_name === sessionFirstName && user.last_name === sessionLastName) {
+    [...user.amount].forEach((amount) => {
+      const expenseYear = amount.date.split('-')[0] * 1;
+      const expenseMonth = amount.date.split('-')[1] * 1;
+      const expenseDay = amount.date.split('-')[2] * 1;
+      if (month === expenseMonth && year === expenseYear) {
+        datasets[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
+        datasets[index].data[expenseDay - 1] += amount.amount * 1;
+      }
+    });
+    // }
+  });
+  return datasets /*.filter((dataset) => dataset.label === sessionFirstName)*/;
 };

@@ -1,17 +1,23 @@
-"use strict";
+'use strict';
 
-import { validateAmount } from "./modules/utils.js";
+import { getSession } from './modules/utils.js';
 
-const amountContainer = document.querySelector("#amount");
-const form = document.querySelector("form");
+const dateInput = document.querySelector('#expenseDate').children[0];
+dateInput.valueAsDate = new Date();
 
-amountContainer.addEventListener("input", (e) => {
-  const invalidFeedback = amountContainer.querySelector(".invalid-feedback");
-  const amount = e.target;
-  validateAmount(amount, invalidFeedback);
-});
+const session = getSession();
 
-form.addEventListener("submit", (e) => {
-  console.log(form.querySelector("#amount").firstElementChild.value);
-  e.preventDefault();
+const form = document.querySelector('form');
+form.addEventListener('submit', (e) => {
+  // e.preventDefault();
+  form.insertAdjacentHTML(
+    'beforeend',
+    `
+    <input type="hidden" name="firstName" value="${session.firstName}" />
+    <input type="hidden" name="lastName" value="${session.lastName}" />
+    <input type="hidden" name="email" value="${session.email}" />
+    <input type="hidden" name="familyName" value="${session.familyName}" />
+    <input type="hidden" name="familyRole" value="${session.familyRole}" />
+  `
+  );
 });

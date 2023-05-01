@@ -11,7 +11,6 @@ connection_string = "mongodb+srv://eldigio:eldigio69@myfamilybank.59d7nxl.mongod
 client = MongoClient(connection_string)
 
 db = client.myfamilybank
-collection = db.myfamilybank
 
 
 @app.get("/")
@@ -38,10 +37,7 @@ def post_sign_up():
     family_name = request.form["family_name"]
     family_role = request.form["family_role"]
 
-    # if family_role == "head":
-    #     cursor.execute("SELECT ")
-
-    collection.insert_one(
+    db.users.insert_one(
         {
             "first_name": first_name,
             "last_name": last_name,
@@ -49,7 +45,8 @@ def post_sign_up():
             "passwd": hashed_password,
             "family": {
                 "role": family_role, "name": family_name
-            }
+            },
+            "amounts": []
         }
     )
 
@@ -71,16 +68,14 @@ def post_login():
     if form_email == "" or form_passwd == "":
         abort(500)
 
-    user = collection.find_one(
+    user = db.users.find_one(
         {"email": {"$eq": form_email}})
-
-    print(user)
-    print(sha256_crypt.verify(form_passwd, user["passwd"]))
 
     if sha256_crypt.verify(form_passwd, user["passwd"]):
         session["logged_in"] = True
         session["firstName"] = user["first_name"]
         session["lastName"] = user["last_name"]
+        session["email"] = user["email"]
         session["family"] = {
             "role": user["family"]["role"], "name": user["family"]["name"]
         }
@@ -91,7 +86,7 @@ def post_login():
 
 @app.get("/logout")
 def logout():
-    session.pop("logged_in")
+    session.clear()
     return redirect("/")
 
 
@@ -102,11 +97,60 @@ def dashboard():
     return redirect("/login")
 
 
-@app.get("/dashboard/expense")
-def dashboard_expense():
+@app.get("/profile")
+def get_profile():
+    if session.get("logged_in"):
+        return render_template("profile.html")
+    return redirect("/login")
+
+
+@app.get("/profile/family")
+def get_profile_family():
+    if session.get("logged_in"):
+        return render_template("profile-family.html")
+    return redirect("/login")
+
+
+@app.get("/profile/expense")
+def get_expense():
     if session.get("logged_in"):
         return render_template("dashboard-expense.html")
     return redirect("/login")
+
+
+@app.post("/profile/expense")
+def post_expense():
+    amount = request.form["amount"]
+    date = request.form["date"]
+    email = request.form["email"]
+    family_name = request.form["familyName"]
+    family_role = request.form["familyRole"]
+    first_name = request.form["firstName"]
+    last_name = request.form["lastName"]
+
+    db.users.update_one(
+        {"first_name": first_name, "last_name": last_name, "email": email},
+        {"$push": {"amounts": {"amount": amount, "date": date}}})
+
+    return redirect("/dashboard")
+
+
+@app.get("/profile/family/<string:familyName>")
+def get_family_by_name(familyName):
+    users = {}
+    results = db.users.find({"family.name": familyName})
+    for i, user in enumerate(results):
+        users.update({
+            f"{i}": {
+                "first_name": user["first_name"],
+                "last_name": user["last_name"],
+                "email": user["email"],
+                "family_role": user["family"]["role"],
+                "family_name": user["family"]["name"],
+                "amount": user["amounts"],
+            }
+        })
+    return jsonify(users)
 
 
 @app.get("/500")

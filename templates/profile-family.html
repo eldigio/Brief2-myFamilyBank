@@ -14,7 +14,7 @@
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
       defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -33,6 +33,7 @@
           <strong>{{session["family"]["name"]}}</strong> -
           <strong class="text-uppercase">{{session["family"]["role"]}}</strong>
         </div>
+        <!-- dropdown -->
         <div class="btn-group">
           <button
             type="button"
@@ -42,28 +43,42 @@
             {{ session["firstName"] }}
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a href="/profile" class="dropdown-item">My Profile</a></li>
+            <li>
+              <a href="/profile" class="dropdown-item">My Profile</a>
+            </li>
             <li>
               <hr class="dropdown-divider" />
             </li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
+            <li>
+              <a href="/logout" class="dropdown-item">Logout</a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
     <!-- Header -->
     <div class="container mb-4">
-      <h1 class="text-center my-4">Dashboard</h1>
+      <h1 class="text-center my-4">Profile | Family</h1>
     </div>
     <!-- Main -->
     <div class="container">
-      <div class="row border border-warning">
-        <div class="col border border-danger">
-          <canvas id="chart"></canvas>
+      <div class="row border">
+        <!-- aside -->
+        <div class="col-md-4 py-4 d-flex flex-column" id="resetDelete">
+          <div class="list-group mb-4">
+            <a href="/profile" class="list-group-item list-group-item-action">General</a>
+            <a href="/profile/family" class="list-group-item list-group-item-action active">Family</a>
+            <a href="/profile/expense" class="list-group-item list-group-item-action" aria-current="true">Expense</a>
+          </div>
+          {% if session["family"]["role"] == "head" %}
+          <button type="button" class="btn btn-secondary w-100 mb-4" id="editProfile">Edit Profile</button>
+          {% endif %}
         </div>
+        <!-- main -->
+        <div class="col-md-8 py-4" id="family"></div>
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='dashboard.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='profile-family.js') }}" type="module"></script>
   </body>
 </html>
