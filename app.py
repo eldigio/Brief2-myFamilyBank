@@ -114,35 +114,30 @@ def post_profile():
         "familyName": request.form["familyName"],
         "familyRole": request.form["familyRole"],
     }
-    
-    if session != form:
-        db.users.update_one(
-            {
-                "first_name": session["first_name"],
-                "last_name": session["last_name"], 
-                "email": session["email"],
-                "family.name": session["familyName"],
-                "family.role": session["familyRole"]
-                },
-            {"$set": {
-                "first_name": form["first_name"],
-                "last_name": form["last_name"],
-                "email": form["email"],
-                "family.name": form["familyName"],
-                "family.role": form["familyRole"],
-            }}
-        )
-        
-        session["first_name"] = form["first_name"]
-        session["last_name"] = form["last_name"]
-        session["email"] = form["email"]
-        session["family"]["name"] = form["familyName"]
-        session["family"]["role"] = form["familyRole"]
-        
-        return redirect("/profile", )
-    
+
+    db.users.update_one(
+        {
+            "first_name": session["firstName"],
+            "last_name": session["lastName"],
+            "email": session["email"],
+            "family.name": session["family"]["name"],
+            "family.role": session["family"]["role"]
+        },
+        {"$set": {
+            "first_name": form["first_name"],
+            "last_name": form["last_name"],
+            "email": form["email"],
+            "family.role": form["familyRole"]
+        }}
+    )
+
+    session["firstName"] = form["first_name"]
+    session["lastName"] = form["last_name"]
+    session["email"] = form["email"]
+    session["family"]["name"] = form["familyName"]
+    session["family"]["role"] = form["familyRole"]
+
     return redirect("/profile")
-    
 
 
 @app.get("/profile/family")
@@ -168,7 +163,7 @@ def post_expense():
     family_role = request.form["sessionFamilyRole"]
     first_name = request.form["sessionFirstName"]
     last_name = request.form["sessionLastName"]
-    
+
     db.users.update_one(
         {"first_name": first_name, "last_name": last_name, "email": email},
         {"$push": {"amounts": {"amount": amount, "date": date}}}

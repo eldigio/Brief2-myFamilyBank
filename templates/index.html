@@ -17,6 +17,7 @@
     <title>My Family Bank</title>
   </head>
   <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-md bg-body-tertiary" data-element="navbar">
       <div class="container">
         <a href="/" class="navbar-brand">Home</a>
@@ -35,8 +36,9 @@
         </div>
       </div>
     </nav>
+    <!-- Header -->
+    <h1 class="text-center text-primary my-4" data-element="header">Homepage</h1>
 
-    <h1 class="text-center text-primary my-4" data-element="homepage">Homepage</h1>
     <section class="mb-5 section1" data-element="section1">
       <div class="container">
         <div class="row p-5 bg-body-tertiary rounded-4">
@@ -132,8 +134,8 @@
       </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>
   </body>
 </html>
