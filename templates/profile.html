@@ -14,7 +14,6 @@
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
       defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -30,17 +29,16 @@
       <div class="container">
         <a href="/" class="navbar-brand">Home</a>
         <div class="mx-auto">
-          <strong>{{session["family"]["name"]}}</strong> -
-          <strong class="text-uppercase">{{session["family"]["role"]}}</strong>
+          <strong id="familyNameNav"></strong> -
+          <strong class="text-uppercase" id="familyRoleNav"></strong>
         </div>
         <div class="btn-group">
           <button
             type="button"
             class="btn btn-outline-secondary dropdown-toggle"
+            id="dropdown"
             data-bs-toggle="dropdown"
-            aria-expanded="false">
-            {{ session["firstName"] }}
-          </button>
+            aria-expanded="false"></button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a href="/profile" class="dropdown-item">My Profile</a></li>
             <li>
@@ -69,13 +67,13 @@
         </div>
         <!-- main -->
         <div class="col-md-8 py-4">
-          <form action="/profile" method="post" class="d-flex flex-column gap-3">
+          <form action="/profile" method="post" class="d-flex flex-column gap-3" id="mainForm">
             <!-- alert -->
             <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
               Please fill out the form!
             </div>
             <!-- name -->
-            <div class="row">
+            <div class="row" id="name">
               <!-- firstName -->
               <div class="col-md d-flex column-gap-1">
                 <div class="form-floating w-100" id="firstName">
@@ -85,7 +83,6 @@
                     id="floatingFirstName"
                     placeholder="firstName"
                     name="firstName"
-                    value="{{session['firstName']}}"
                     autocomplete="off"
                     required
                     disabled />
@@ -102,7 +99,6 @@
                     id="floatingLastName"
                     placeholder="lastName"
                     name="lastName"
-                    value="{{session['lastName']}}"
                     autocomplete="off"
                     required
                     disabled />
@@ -119,7 +115,6 @@
                 id="floatingEmail"
                 placeholder="email@example.com"
                 name="email"
-                value="{{session['email']}}"
                 autocomplete="off"
                 required
                 disabled />
@@ -127,21 +122,20 @@
               <div class="invalid-feedback"></div>
             </div>
             <!-- family -->
-            <div class="row">
+            <div class="row" id="family">
               <!-- name -->
               <div class="col-md">
-                <div class="form-floating" id="familyRole">
+                <div class="form-floating" id="familyName">
                   <input
                     type="text"
                     class="form-control"
-                    id="floatingFamilyRole"
-                    placeholder="familyRole"
-                    name="familyRole"
-                    value="{{session['family']['name']}}"
+                    id="floatingFamilyName"
+                    placeholder="familyName"
+                    name="familyName"
                     autocomplete="off"
                     required
-                    disabled />
-                  <label for="floatingFamilyRole">Family Name</label>
+                    readonly />
+                  <label for="floatingFamilyName">Family Name</label>
                   <div class="invalid-feedback"></div>
                 </div>
               </div>

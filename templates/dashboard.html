@@ -30,17 +30,16 @@
       <div class="container">
         <a href="/" class="navbar-brand">Home</a>
         <div class="mx-auto">
-          <strong>{{session["family"]["name"]}}</strong> -
-          <strong class="text-uppercase">{{session["family"]["role"]}}</strong>
+          <strong id="familyNameNav"></strong> -
+          <strong class="text-uppercase" id="familyRoleNav"></strong>
         </div>
         <div class="btn-group">
           <button
             type="button"
             class="btn btn-outline-secondary dropdown-toggle"
+            id="dropdown"
             data-bs-toggle="dropdown"
-            aria-expanded="false">
-            {{ session["firstName"] }}
-          </button>
+            aria-expanded="false"></button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a href="/profile" class="dropdown-item">My Profile</a></li>
             <li>

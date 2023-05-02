@@ -114,16 +114,16 @@ export const animateCSS = (element, animation, prefix = 'animate__') => {
   });
 };
 
-export const toggleEditProfile = (btnEditProfile, resetDeleteContainer, end = false) => {
+export const toggleEditProfile = (btnEditProfile, resetDeleteContainer, position = 'beforeend') => {
   if (btnEditProfile.classList.contains('btn-secondary')) {
     btnEditProfile.classList.replace('btn-secondary', 'btn-outline-secondary');
     resetDeleteContainer.insertAdjacentHTML(
-      end ? 'beforeend' : 'afterbegin',
-      `<a href="/profile${end ? '/family' : ''}" class="btn btn-outline-primary">Save Changes</a>`
+      position,
+      `<button tye="submit" class="btn btn-outline-primary" id="saveProfile">Save Changes</button>`
     );
   } else {
     btnEditProfile.classList.replace('btn-outline-secondary', 'btn-secondary');
-    resetDeleteContainer.querySelector('.btn.btn-outline-primary').remove();
+    resetDeleteContainer.children.saveProfile.remove();
   }
 };
 
@@ -168,7 +168,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
         <div class="col-md">
           <div class="form-floating" id="familyName">
             <input type="text" class="form-control" id="floatingFamilyName" placeholder="familyName"
-              name="familyName" value="${jsonData[key].family_name}" autocomplete="off" required disabled />
+              name="familyName" value="${jsonData[key].family_name}" autocomplete="off" required readonly />
             <label for="floatingFamilyName">Family Name</label>
             <div class="invalid-feedback"></div>
           </div>
@@ -185,6 +185,19 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
     ${index !== jsonDataKeys.length - 1 ? `<div class="border my-4"></div>` : ``}
 `;
   return html;
+};
+
+export const insertSessionData = (form, session) => {
+  form.insertAdjacentHTML(
+    'beforeend',
+    `
+    <input type="hidden" name="sessionFirstName" value="${session.firstName}" />
+    <input type="hidden" name="sessionLastName" value="${session.lastName}" />
+    <input type="hidden" name="sessionEmail" value="${session.email}" />
+    <input type="hidden" name="sessionFamilyName" value="${session.familyName}" />
+    <input type="hidden" name="sessionFamilyRole" value="${session.familyRole}" />
+  `
+  );
 };
 
 export const createWhitelist = (familyRole) => {

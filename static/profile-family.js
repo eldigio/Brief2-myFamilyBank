@@ -23,12 +23,12 @@ const btnEditProfile = document.querySelector('#editProfile');
 if (btnEditProfile) {
   btnEditProfile.addEventListener('click', (e) => {
     const forms = document.querySelectorAll('form');
+
+    toggleEditProfile(btnEditProfile, document.querySelector('#resetDelete'));
+    const whitelist = createWhitelist(session.familyRole);
+
     forms.forEach((form) => {
       const inputs = form.querySelectorAll('input, select');
-
-      const resetDeleteContainer = document.querySelector('#resetDelete');
-      toggleEditProfile(btnEditProfile, resetDeleteContainer, true);
-      const whitelist = createWhitelist(session.familyRole);
 
       inputs.forEach((input) => {
         if (whitelist.some((value) => input.name.includes(value))) {

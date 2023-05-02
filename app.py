@@ -7,7 +7,7 @@ app.config["DEBUG"] = True
 
 app.config["SECRET_KEY"] = "PippoPlutoPaperino"
 
-connection_string = "mongodb+srv://eldigio:eldigio69@myfamilybank.59d7nxl.mongodb.net/"
+connection_string = "mongodb+srv://eldigio:eldigio69@myfamilybank.59d7nxl.mongodb.net/test"
 client = MongoClient(connection_string)
 
 db = client.myfamilybank
@@ -99,9 +99,50 @@ def dashboard():
 
 @app.get("/profile")
 def get_profile():
+    global session
     if session.get("logged_in"):
         return render_template("profile.html")
     return redirect("/login")
+
+
+@app.post("/profile")
+def post_profile():
+    form = {
+        "first_name": request.form["firstName"],
+        "last_name": request.form["lastName"],
+        "email": request.form["email"],
+        "familyName": request.form["familyName"],
+        "familyRole": request.form["familyRole"],
+    }
+    
+    if session != form:
+        db.users.update_one(
+            {
+                "first_name": session["first_name"],
+                "last_name": session["last_name"], 
+                "email": session["email"],
+                "family.name": session["familyName"],
+                "family.role": session["familyRole"]
+                },
+            {"$set": {
+                "first_name": form["first_name"],
+                "last_name": form["last_name"],
+                "email": form["email"],
+                "family.name": form["familyName"],
+                "family.role": form["familyRole"],
+            }}
+        )
+        
+        session["first_name"] = form["first_name"]
+        session["last_name"] = form["last_name"]
+        session["email"] = form["email"]
+        session["family"]["name"] = form["familyName"]
+        session["family"]["role"] = form["familyRole"]
+        
+        return redirect("/profile", )
+    
+    return redirect("/profile")
+    
 
 
 @app.get("/profile/family")
@@ -122,15 +163,16 @@ def get_expense():
 def post_expense():
     amount = request.form["amount"]
     date = request.form["date"]
-    email = request.form["email"]
-    family_name = request.form["familyName"]
-    family_role = request.form["familyRole"]
-    first_name = request.form["firstName"]
-    last_name = request.form["lastName"]
-
+    email = request.form["sessionEmail"]
+    family_name = request.form["sessionFamilyName"]
+    family_role = request.form["sessionFamilyRole"]
+    first_name = request.form["sessionFirstName"]
+    last_name = request.form["sessionLastName"]
+    
     db.users.update_one(
         {"first_name": first_name, "last_name": last_name, "email": email},
-        {"$push": {"amounts": {"amount": amount, "date": date}}})
+        {"$push": {"amounts": {"amount": amount, "date": date}}}
+    )
 
     return redirect("/dashboard")
 
