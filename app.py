@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session, url_for, abort
+from flask import Flask, request, jsonify, render_template, redirect, session, flash, abort
 from passlib.hash import sha256_crypt
 from pymongo import MongoClient
 
@@ -68,8 +68,7 @@ def post_login():
     if form_email == "" or form_passwd == "":
         abort(500)
 
-    user = db.users.find_one(
-        {"email": {"$eq": form_email}})
+    user = db.users.find_one({"email": {"$eq": form_email}})
 
     if sha256_crypt.verify(form_passwd, user["passwd"]):
         session["logged_in"] = True
@@ -81,6 +80,7 @@ def post_login():
         }
         return redirect("/dashboard")
 
+    flash("Invalid password", "err")
     return redirect("/login")
 
 
@@ -189,6 +189,18 @@ def get_family_by_name(familyName):
         })
     return jsonify(users)
 
+@app.get("/api/all-users")
+def get_all_users():
+    users = {}
+    result = db.users.find({}, {"email": 1})
+    for i, user in  enumerate(result):
+        users.update({
+            f"{i}": {
+                "email": user["email"],
+            }
+        })
+    
+    return jsonify(users)
 
 @app.get("/500")
 def error_500():

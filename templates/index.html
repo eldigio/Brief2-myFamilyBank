@@ -18,9 +18,11 @@
   </head>
   <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-md bg-body-tertiary" data-element="navbar">
+    <nav class="navbar navbar-expand-md bg-body-tertiary">
       <div class="container">
-        <a href="/" class="navbar-brand">Home</a>
+        <a href="/" class="navbar-brand">
+          <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -37,9 +39,11 @@
       </div>
     </nav>
     <!-- Header -->
-    <h1 class="text-center text-primary my-4" data-element="header">Homepage</h1>
+    <header>
+      <h1 class="text-center text-primary my-4" data-element="header">Homepage</h1>
+    </header>
 
-    <section class="mb-5 section1" data-element="section1">
+    <section class="mb-5 section1">
       <div class="container">
         <div class="row p-5 bg-body-tertiary rounded-4">
           <div class="col-md-5 my-auto">
@@ -58,7 +62,7 @@
       </div>
     </section>
 
-    <section class="mb-5 section2" data-element="section2">
+    <section class="mb-5 section2">
       <div class="container">
         <div class="row p-5 bg-body-tertiary rounded-4">
           <div class="col-md-6 my-auto">
@@ -74,7 +78,7 @@
       </div>
     </section>
 
-    <section class="mb-5" data-element="section3">
+    <section class="mb-5 section3">
       <div class="container">
         <div class="row row-gap-md-0 row-gap-4 p-5 bg-body-tertiary rounded-4">
           <h2 class="text-center text-warning mb-5">Why choose us</h2>
@@ -112,7 +116,7 @@
       </div>
     </section>
 
-    <footer data-element="footer" class="bg-body-tertiary">
+    <footer class="bg-body-tertiary">
       <div class="container">
         <div class="row py-3">
           <div class="col-md my-auto">
@@ -136,6 +140,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-    <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="{{ url_for('static', filename='index.js') }}" type="module"></script>
   </body>
 </html>

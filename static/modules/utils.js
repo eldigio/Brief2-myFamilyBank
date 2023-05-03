@@ -2,6 +2,8 @@ export const sleep = (seconds) => new Promise((r) => setTimeout(r, seconds * 100
 
 export const emailRegex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
+export const duration = 0.5;
+
 export const getSession = () => {
   let session = {};
   return (session = {
@@ -93,25 +95,22 @@ export const validFamilyName = (familyName, invalidFeedback) => {
   return true;
 };
 
-export const animateCSS = (element, animation, prefix = 'animate__') => {
-  // We create a Promise and return it
-  new Promise((resolve, reject) => {
-    const animationName = `${prefix}${animation}`;
-    const node = document.querySelector(element);
+export const showAlert = async (alert, errorMessage) => {
+  alert.classList.remove('d-none');
+  alert.textContent = errorMessage;
+  await gsap.fromTo('.alert-danger', { opacity: 0 }, { opacity: 1, duration, ease: 'power4.out' });
+};
 
-    node.classList.remove('d-none');
-    node.classList.add(`${prefix}animated`, animationName);
+export const hideAlert = async (alert) => {
+  await gsap.fromTo('.alert-danger', { opacity: 1 }, { opacity: 0, duration, ease: 'power4.out' });
+  alert.textContent = '';
+  alert.classList.add('d-none');
+};
 
-    // When the animation ends, we clean the classes and resolve the Promise
-    function handleAnimationEnd(event) {
-      event.stopPropagation();
-      node.classList.remove(`${prefix}animated`, animationName);
-      if (animationName.includes('fadeOut')) node.classList.add('d-none');
-      resolve('Animation ended');
-    }
-
-    node.addEventListener('animationend', handleAnimationEnd, { once: true });
-  });
+export const flashAlert = async (alert, errorMessage, sleepTime = 5) => {
+  showAlert(alert, errorMessage);
+  await sleep(sleepTime);
+  hideAlert(alert);
 };
 
 export const toggleEditProfile = (btnEditProfile, resetDeleteContainer, position = 'beforeend') => {

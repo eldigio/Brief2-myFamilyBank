@@ -1,38 +1,79 @@
-"use strict";
+'use strict';
 
-import { animateCSS, isEmpty, sleep, validEmail, validInput, validPassword } from "./modules/utils.js";
+import { isEmpty, sleep, validEmail, validInput, validPassword, duration, flashAlert } from './modules/utils.js';
 
-const form = document.querySelector("form");
-const emailContainer = document.querySelector("#email");
-const passwordContainer = document.querySelector("#password");
+gsap.registerPlugin(ScrollTrigger);
+const tl = gsap.timeline({ defaults: { duration, opacity: 0, ease: 'power4.out', scale: 0.75 } });
+
+const alertError = document.querySelector('#alertError');
+
+if (!alertError) {
+  tl.from('nav', { y: '-100%' })
+    .from('header', { y: '-125%' })
+    .from('#email', { y: '-100%' })
+    .from('#password', { y: '-100%' })
+    .from('#login', { y: '-100%' });
+} else {
+  tl.from('nav', { y: '-100%' })
+    .from('header', { y: '-125%' })
+    .from('#alertError', { y: '-100%' })
+    .from('#email', { y: '-100%' })
+    .from('#password', { y: '-100%' })
+    .from('#login', { y: '-100%' });
+}
+
+const form = document.querySelector('form');
+const emailContainer = document.querySelector('#email');
+const passwordContainer = document.querySelector('#password');
 
 const canSubmit = {
-  email: false,
-  password: false,
+  email: { empty: true, valid: false },
+  password: { empty: true, valid: false },
 };
 
-form.addEventListener("submit", (e) => {
-  if (!canSubmit.email || !canSubmit.password) {
-    e.preventDefault();
-    animateCSS("#alert-danger", "fadeIn");
-    sleep(5);
-    animateCSS("#alert-danger", "fadeOut");
-    return;
-  }
-});
-
-emailContainer.addEventListener("input", (e) => {
-  const invalidFeedback = emailContainer.querySelector(".invalid-feedback");
+emailContainer.addEventListener('input', (e) => {
+  const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+  canSubmit.email.empty = false;
   if (!validEmail(e.target, invalidFeedback)) return;
   validInput(e.target);
-  canSubmit.email = true;
+  canSubmit.email.valid = true;
 });
 
-passwordContainer.addEventListener("input", (e) => {
-  const invalidFeedback = passwordContainer.querySelector(".invalid-feedback");
+passwordContainer.addEventListener('input', (e) => {
+  const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+  canSubmit.password.empty = false;
   if (!validPassword(e.target, invalidFeedback)) return;
   validInput(e.target);
-  canSubmit.password = true;
+  canSubmit.password.valid = true;
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let canSubmitForm = false;
+  const alert = form.querySelector('.alert-danger');
+  if (canSubmit.email.empty || canSubmit.password.empty) {
+    flashAlert(alert, 'Please fill out the form');
+    return;
+  }
+  if (!canSubmit.email.valid || !canSubmit.password.valid) {
+    flashAlert(alert, 'Invalid credentials');
+    return;
+  }
+
+  const response = await fetch('http://127.0.0.1:5000/api/all-users');
+  const json = await response.json();
+  const jsonKeys = Object.keys(json);
+  const emailInput = e.target.children.email.children.email;
+  jsonKeys.forEach((key) => {
+    if (json[key].email === emailInput.value) canSubmitForm = true;
+  });
+
+  if (!canSubmitForm) {
+    flashAlert(alert, 'Email does not exists');
+    return;
+  }
+
+  form.submit();
 });
