@@ -8,11 +8,10 @@ import {
   validInput,
   validName,
   validPassword,
-  duration,
 } from './modules/utils.js';
 
 gsap.registerPlugin(ScrollTrigger);
-const tl = gsap.timeline({ defaults: { duration, opacity: 0, ease: 'power4.out', scale: 0.75 } });
+const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
 const form = document.querySelector('form');
 const firstNameContainer = document.querySelector('#firstName');
@@ -24,12 +23,7 @@ const familyNameContainer = document.querySelector('#familyName');
 
 tl.from('nav', { y: '-100%' })
   .from('header', { y: '-125%' })
-  .from(firstNameContainer, { y: '-100%' })
-  .from(lastNameContainer, { y: '-100%' })
-  .from(emailContainer, { y: '-100%' })
-  .from(passwordContainer, { y: '-100%' })
-  .from(familyRoleContainer, { y: '-100%' })
-  .from(familyNameContainer, { y: '-100%' })
+  .from('.input', { y: '-100%', stagger: (index) => index / 10 })
   .from('#signUp', { y: '-100%' });
 
 const canSubmit = {

@@ -20,7 +20,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-sm bg-body-tertiary">
       <div class="container">
-        <a href="/" class="navbar-brand">Home</a>
+        <a href="/" class="navbar-brand"
+          ><img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4"
+        /></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -42,57 +44,80 @@
     </header>
     <!-- Main -->
     <div class="container">
-      <form action="/sign-up" method="post" class="w-75 mx-auto">
-        <!-- alert -->
-        <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
-          Please fill out the form!
-        </div>
-        <!-- name -->
-        <div class="mb-3 d-flex column-gap-3" id="fullName">
-          <!-- first name -->
-          <div class="form-floating w-50" id="firstName">
-            <input type="text" class="form-control" name="first_name" placeholder="firstName" />
-            <label>First Name</label>
+      <div class="card rounded-4 p-5 shadow-lg border-info-subtle">
+        <form action="/sign-up" method="post">
+          <!-- alert -->
+          <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
+            Please fill out the form!
+          </div>
+          <!-- name -->
+          <div class="mb-3 d-flex column-gap-3" id="fullName">
+            <!-- first name -->
+            <div class="form-floating w-50 input" id="firstName">
+              <input
+                type="text"
+                class="form-control border-primary-subtle rounded-4"
+                name="first_name"
+                placeholder="firstName" />
+              <label>First Name</label>
+              <div class="invalid-feedback"></div>
+            </div>
+            <!-- last name -->
+            <div class="form-floating w-50 input" id="lastName">
+              <input
+                type="text"
+                class="form-control border-primary-subtle rounded-4"
+                name="last_name"
+                placeholder="lastName" />
+              <label>Last Name</label>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- email -->
+          <div class="form-floating mb-3 input" id="email">
+            <input
+              type="email"
+              class="form-control border-primary-subtle rounded-4"
+              placeholder="email@example.com"
+              name="email"
+              autocomplete="off" />
+            <label>Email address</label>
             <div class="invalid-feedback"></div>
           </div>
-          <!-- last name -->
-          <div class="form-floating w-50" id="lastName">
-            <input type="text" class="form-control" name="last_name" placeholder="lastName" />
-            <label>Last Name</label>
+          <!-- password -->
+          <div class="form-floating mb-3 input" id="password">
+            <input
+              type="password"
+              class="form-control border-primary-subtle rounded-4"
+              placeholder="Password"
+              name="passwd" />
+            <label>Password</label>
             <div class="invalid-feedback"></div>
           </div>
-        </div>
-        <!-- email -->
-        <div class="form-floating mb-3" id="email">
-          <input type="email" class="form-control" placeholder="email@example.com" name="email" autocomplete="off" />
-          <label>Email address</label>
-          <div class="invalid-feedback"></div>
-        </div>
-        <!-- password -->
-        <div class="form-floating mb-3" id="password">
-          <input type="password" class="form-control" placeholder="Password" name="passwd" />
-          <label>Password</label>
-          <div class="invalid-feedback"></div>
-        </div>
-        <!-- family -->
-        <div class="d-flex column-gap-3 mb-5" id="family">
-          <!-- family role -->
-          <div class="form-floating w-50" id="familyRole">
-            <select name="family_role" class="form-select">
-              <option value="head">Capo Famiglia</option>
-              <option value="member">Familiare</option>
-            </select>
-            <label>Ruolo Familiare</label>
+          <!-- family -->
+          <div class="d-flex column-gap-3 mb-5" id="family">
+            <!-- family role -->
+            <div class="form-floating w-50 input" id="familyRole">
+              <select name="family_role" class="form-select border-primary-subtle rounded-4">
+                <option value="head">Capo Famiglia</option>
+                <option value="member">Familiare</option>
+              </select>
+              <label>Ruolo Familiare</label>
+            </div>
+            <!-- family name -->
+            <div class="form-floating w-50 input" id="familyName">
+              <input
+                type="text"
+                class="form-control border-primary-subtle rounded-4"
+                placeholder="family_name"
+                name="family_name" />
+              <label>Family Name</label>
+              <div class="invalid-feedback"></div>
+            </div>
           </div>
-          <!-- family name -->
-          <div class="form-floating w-50" id="familyName">
-            <input type="text" class="form-control" placeholder="family_name" name="family_name" />
-            <label>Family Name</label>
-            <div class="invalid-feedback"></div>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-outline-primary btn-lg py-3 fs-3 w-100" id="signUp">Sign Up</button>
-      </form>
+          <button type="submit" class="btn btn-outline-primary btn-lg py-3 fs-3 w-100" id="signUp">Sign Up</button>
+        </form>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>

@@ -1,59 +1,33 @@
 'use strict';
 
-import { getAllDaysInMonth, getDayName, getMonthName, getSession, getUsersChartDataset } from './modules/utils.js';
+import { getSession, createChart } from './modules/utils.js';
+
+gsap.registerPlugin(ScrollTrigger);
+const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
 const session = getSession();
+console.table(session);
 
 const fetchData = async () => {
   const response = await fetch(`http://127.0.0.1:5000/profile/family/${session.familyName}`);
   const jsonData = Object.values(await response.json());
 
-  const jsonDataKeys = Object.keys(jsonData);
-  const dropdown = document.querySelector('#dropdown');
+  const profile = document.querySelector('svg');
   const familyNameNav = document.querySelector('#familyNameNav');
   const familyRoleNav = document.querySelector('#familyRoleNav');
-  jsonDataKeys.forEach((key) => {
-    dropdown.textContent = jsonData[key].first_name;
-    familyNameNav.textContent = jsonData[key].family_name;
-    familyRoleNav.textContent = jsonData[key].family_role;
-  });
 
-  const ctx = document.querySelector('#chart');
+  profile.setAttribute('data-jdenticon-value', session.firstName);
+  familyNameNav.textContent = session.familyName;
+  familyRoleNav.textContent = session.familyRole;
 
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1;
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      datasets: getUsersChartDataset(jsonData, session.firstName, session.lastName, currentYear, currentMonth),
-      labels: getAllDaysInMonth(currentYear, currentMonth),
-    },
-    responsive: true,
-    options: {
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true },
-      },
-      plugins: {
-        title: {
-          display: true,
-          text: `${getMonthName(currentMonth)} ${currentYear}`,
-        },
-        tooltip: {
-          callbacks: {
-            title: (day) => {
-              const currentDay = day[0].label;
-              return `${getDayName(`${currentYear}-${currentMonth}-${currentDay}`)}`;
-            },
-          },
-        },
-      },
-    },
-  });
+  await tl
+    .from('nav', { y: '-100%' })
+    .from('.nav-element', { y: '-100%', stagger: 0.2 })
+    .from('header', { y: '-100%' });
+  const chart = createChart(jsonData, session);
 
   // console.log(Object.keys(Chart));
   // console.log(Chart.defaults);
 };
+
 fetchData();

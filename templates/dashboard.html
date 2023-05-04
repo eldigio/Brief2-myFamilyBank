@@ -14,7 +14,15 @@
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
       defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js"
+      async
+      integrity="sha384-yBhgDqxM50qJV5JPdayci8wCfooqvhFYbIKhv0hTtLvfeeyJMJCscRfFNKIxt43M"
+      crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}" type="module" defer></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -25,44 +33,33 @@
       <input type="hidden" name="sessionFamilyName" value="{{session['family']['name']}}" />
       <input type="hidden" name="sessionFamilyRole" value="{{session['family']['role']}}" />
     </div>
-    <!-- Navbar -->
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container">
-        <a href="/" class="navbar-brand">Home</a>
-        <div class="mx-auto">
-          <strong id="familyNameNav"></strong> -
-          <strong class="text-uppercase" id="familyRoleNav"></strong>
+        <a href="/" class="navbar-brand nav-element">
+          <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+        </a>
+        <div class="nav-element d-flex column-gap-3">
+          <div id="familyNameNav" class="fw-bold"></div>
+          <span>-</span>
+          <div class="text-uppercase fw-bold" id="familyRoleNav"></div>
         </div>
-        <div class="btn-group">
-          <button
-            type="button"
-            class="btn btn-outline-secondary dropdown-toggle"
-            id="dropdown"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"></button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a href="/profile" class="dropdown-item">My Profile</a></li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
-          </ul>
+        <div class="nav-item nav-element">
+          <a href="/profile"><svg width="50" height="50" data-jdenticon-value=""></svg></a>
         </div>
       </div>
     </nav>
-    <!-- Header -->
-    <div class="container mb-4">
+
+    <header class="container mb-4">
       <h1 class="text-center my-4">Dashboard</h1>
-    </div>
-    <!-- Main -->
-    <div class="container">
+    </header>
+
+    <main class="container">
       <div class="row border border-warning">
         <div class="col border border-danger">
           <canvas id="chart"></canvas>
         </div>
       </div>
-    </div>
-
-    <script src="{{ url_for('static', filename='dashboard.js') }}" type="module"></script>
+    </main>
   </body>
 </html>

@@ -1,18 +1,18 @@
 'use strict';
 
-import { isEmpty, sleep, validEmail, validInput, validPassword, duration, flashAlert } from './modules/utils.js';
+import { isEmpty, validEmail, validInput, validPassword, flashAlert } from './modules/utils.js';
 
 gsap.registerPlugin(ScrollTrigger);
-const tl = gsap.timeline({ defaults: { duration, opacity: 0, ease: 'power4.out', scale: 0.75 } });
+const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
 const alertError = document.querySelector('#alertError');
 
 if (!alertError) {
   tl.from('nav', { y: '-100%' })
     .from('header', { y: '-125%' })
-    .from('#email', { y: '-100%' })
-    .from('#password', { y: '-100%' })
-    .from('#login', { y: '-100%' });
+    .from('.card', { y: '-50%' })
+    .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+    .from('#login', { y: '-100%', duration: 0.2 });
 } else {
   tl.from('nav', { y: '-100%' })
     .from('header', { y: '-125%' })

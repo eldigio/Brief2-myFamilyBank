@@ -9,11 +9,21 @@
       rel="stylesheet"
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
       defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js"
+      async
+      integrity="sha384-yBhgDqxM50qJV5JPdayci8wCfooqvhFYbIKhv0hTtLvfeeyJMJCscRfFNKIxt43M"
+      crossorigin="anonymous"
+      defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+    <script src="{{ url_for('static', filename='dashboard-expense.js') }}" type="module" defer></script>
     <title>My Family Bank</title>
   </head>
   <body>
@@ -24,113 +34,115 @@
       <input type="hidden" name="sessionFamilyName" value="{{session['family']['name']}}" />
       <input type="hidden" name="sessionFamilyRole" value="{{session['family']['role']}}" />
     </div>
-    <!-- Navbar -->
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container">
-        <a href="/" class="navbar-brand">Home</a>
-        <div class="mx-auto">
-          <strong>{{session["family"]["name"]}}</strong> -
-          <strong class="text-uppercase">{{session["family"]["role"]}}</strong>
+        <a href="/" class="navbar-brand nav-element">
+          <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+        </a>
+        <div class="nav-element d-flex column-gap-3">
+          <div id="familyNameNav" class="fw-bold"></div>
+          <span>-</span>
+          <div class="text-uppercase fw-bold" id="familyRoleNav"></div>
         </div>
-        <div class="btn-group">
-          <button
-            type="button"
-            class="btn btn-outline-secondary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-            {{ session["firstName"] }}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a href="/profile" class="dropdown-item">My Profile</a></li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
-          </ul>
+        <div class="btn-group nav-element">
+          <a href="/profile"><svg width="50" height="50" data-jdenticon-value=""></svg></a>
         </div>
       </div>
     </nav>
-    <!-- Header -->
-    <div class="container mb-4">
-      <h1 class="text-center my-4">Profile | Expense</h1>
-    </div>
-    <!-- Main -->
-    <div class="container">
-      <div class="row border">
-        <!-- aside -->
-        <div class="col-md-4 my-4">
-          <div class="list-group mb-4">
-            <a href="/profile" class="list-group-item list-group-item-action">General</a>
-            <a href="/profile/family" class="list-group-item list-group-item-action">Family</a>
-            <a href="/profile/expense" class="list-group-item list-group-item-action active">Expense</a>
-          </div>
-        </div>
-        <!-- main -->
-        <div class="col-md-8 py-4">
-          <form action="/profile/expense" method="post" class="d-flex flex-column gap-3">
-            <!-- alert -->
-            <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
-              Please fill out the form!
-            </div>
-            <!-- amount -->
-            <div class="form-floating" id="amount">
-              <input
-                type="number"
-                class="form-control"
-                id="floatingAmount"
-                placeholder="amount"
-                name="amount"
-                autocomplete="off"
-                required />
-              <label for="floatingAmount">Expense Amount</label>
-              <div class="invalid-feedback"></div>
-            </div>
-            <!-- family/expense date -->
-            <div class="row">
-              <!-- family name -->
-              <div class="col-md">
-                <div class="form-floating" id="familyName">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="floatingFamilyName"
-                    placeholder="familyName"
-                    name="familyName"
-                    value="{{session['family']['name']}}"
-                    autocomplete="off"
-                    required
-                    disabled />
-                  <label for="floatingFamilyName">Family Name</label>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- expense date -->
-              <div class="col-md">
-                <div class="form-floating" id="expenseDate">
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="floatingExpenseDate"
-                    placeholder="expenseDate"
-                    name="date"
-                    required />
-                  <label for="floatingExpenseDate">Expense Date</label>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-            </div>
-            <!-- reset/submit -->
-            <div class="d-flex justify-content-between mt-4" id="resetDelete">
-              <!-- reset -->
-              <button type="reset" class="btn btn-outline-secondary">Reset</button>
-              <!-- sumbit -->
-              <button type="submit" class="btn btn-outline-primary">Submit</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
-    <script src="{{ url_for('static', filename='dashboard-expense.js') }}" type="module"></script>
+    <header class="container mb-4">
+      <h1 class="text-center my-4 text-primary">Profile | Expense</h1>
+    </header>
+
+    <main class="container">
+      <div class="row">
+        <aside class="col-lg-2 my-4">
+          <div class="list-group mb-4">
+            <a href="/profile" class="list-group-item list-group-item-action">
+              <i class="bi bi-bank"></i>
+              General</a
+            >
+            <a href="/profile/family" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i>
+              Family</a
+            >
+            <a href="/profile/expense" class="list-group-item list-group-item-action active">
+              <i class="bi bi-cash"></i>
+              Expense</a
+            >
+            <a href="/logout" class="list-group-item list-group-item-danger list-group-item-action">
+              <i class="bi bi-box-arrow-left"></i>
+              Logout</a
+            >
+          </div>
+        </aside>
+
+        <main class="col-lg-10 py-4">
+          <div class="card rounded-4 p-3 shadow-lg border-info-subtle">
+            <form action="/profile/expense" method="post" class="d-flex flex-column gap-3">
+              <!-- alert -->
+              <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
+                Please fill out the form!
+              </div>
+              <!-- amount -->
+              <div class="form-floating input" id="amount">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="floatingAmount"
+                  placeholder="amount"
+                  name="amount"
+                  autocomplete="off"
+                  required />
+                <label for="floatingAmount">Expense Amount</label>
+                <div class="invalid-feedback"></div>
+              </div>
+              <!-- family/expense date -->
+              <div class="row">
+                <!-- family name -->
+                <div class="col-lg">
+                  <div class="form-floating input" id="familyName">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="floatingFamilyName"
+                      placeholder="familyName"
+                      name="familyName"
+                      value="{{session['family']['name']}}"
+                      autocomplete="off"
+                      required
+                      disabled />
+                    <label for="floatingFamilyName">Family Name</label>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                </div>
+                <!-- expense date -->
+                <div class="col-lg">
+                  <div class="form-floating input" id="expenseDate">
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="floatingExpenseDate"
+                      placeholder="expenseDate"
+                      name="date"
+                      required />
+                    <label for="floatingExpenseDate">Expense Date</label>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- reset/submit -->
+              <div class="d-flex justify-content-between mt-4" id="resetDelete">
+                <!-- reset -->
+                <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                <!-- sumbit -->
+                <button type="submit" class="btn btn-outline-primary">Submit</button>
+              </div>
+            </form>
+          </div>
+        </main>
+      </div>
+    </main>
   </body>
 </html>

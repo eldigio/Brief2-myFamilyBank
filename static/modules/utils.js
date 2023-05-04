@@ -2,8 +2,6 @@ export const sleep = (seconds) => new Promise((r) => setTimeout(r, seconds * 100
 
 export const emailRegex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
-export const duration = 0.5;
-
 export const getSession = () => {
   let session = {};
   return (session = {
@@ -128,6 +126,7 @@ export const toggleEditProfile = (btnEditProfile, resetDeleteContainer, position
 
 export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
   const html = `
+  <div class="card rounded-4 p-3 shadow-lg border-info-subtle">
     <form action="/profile/family" method="post" class="d-flex flex-column gap-3">
       <!-- alert -->
       <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
@@ -136,7 +135,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
       <!-- name -->
       <div class="row">
         <!-- firstName -->
-        <div class="col-md">
+        <div class="col-lg input">
           <div class="form-floating d-flex" id="firstName">
             <input type="text" class="form-control" id="floatingFirstName" placeholder="firstName"
               name="firstName" value="${jsonData[key].first_name}" autocomplete="off" required disabled />
@@ -145,7 +144,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
           </div>
         </div>
         <!-- lastName -->
-        <div class="col-md">
+        <div class="col-lg input">
           <div class="form-floating d-flex align-items-center" id="lastName">
             <input type="text" class="form-control" id="floatingLastName" placeholder="lastName"
               name="lastName" value="${jsonData[key].last_name}" autocomplete="off" required disabled />
@@ -155,7 +154,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
         </div>
       </div>
       <!-- email -->
-      <div class="form-floating" id="email">
+      <div class="form-floating input" id="email">
         <input type="email" class="form-control" id="floatingEmail" placeholder="email@example.com"
           name="email" value="${jsonData[key].email}" autocomplete="off" required disabled />
         <label for="floatingEmail">Email address</label>
@@ -164,7 +163,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
       <!-- family -->
       <div class="row">
         <!-- name -->
-        <div class="col-md">
+        <div class="col-lg input">
           <div class="form-floating" id="familyName">
             <input type="text" class="form-control" id="floatingFamilyName" placeholder="familyName"
               name="familyName" value="${jsonData[key].family_name}" autocomplete="off" required readonly />
@@ -173,7 +172,7 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
           </div>
         </div>
         <!-- role -->
-        <div class="col-md">
+        <div class="col-lg input">
           <select class="form-select form-select-lg h-100" id="familyRole" name="familyRole" disabled>
             <option value="head" ${jsonData[key].family_role === 'head' ? 'selected' : ''}>Head</option>
             <option value="member" ${jsonData[key].family_role === 'member' ? 'selected' : ''}>Member</option>
@@ -181,7 +180,8 @@ export const createFamilyHTML = (jsonData, key, jsonDataKeys, index) => {
         </div>
       </div>
     </form>
-    ${index !== jsonDataKeys.length - 1 ? `<div class="border my-4"></div>` : ``}
+  </div>
+    ${index !== jsonDataKeys.length - 1 ? `<div class="border my-4" id="divider"></div>` : ``}
 `;
   return html;
 };
@@ -207,21 +207,6 @@ export const createWhitelist = (familyRole) => {
     whitelist = ['firstName', 'lastName', 'email'];
   }
   return whitelist;
-};
-
-export const jsonToObject = (jsonData) => {
-  let data = [];
-  const jsonDataKeys = Object.keys(jsonData);
-  jsonDataKeys.forEach((key, index) => {
-    data.push({
-      amount: jsonData[key].amount,
-      date: jsonData[key].date,
-      familyName: jsonData[key].family_name,
-      firstName: jsonData[key].first_name,
-      lastName: jsonData[key].last_name,
-    });
-  });
-  return data;
 };
 
 export const getDayName = (dateString, locale = 'en-US') => {
@@ -273,4 +258,43 @@ export const getUsersChartDataset = (jsonData, sessionFirstName, sessionLastName
     // }
   });
   return datasets /*.filter((dataset) => dataset.label === sessionFirstName)*/;
+};
+
+export const createChart = (jsonData, session) => {
+  const ctx = document.querySelector('#chart');
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      datasets: getUsersChartDataset(jsonData, session.firstName, session.lastName, currentYear, currentMonth),
+      labels: getAllDaysInMonth(currentYear, currentMonth),
+    },
+    responsive: true,
+    options: {
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true },
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: `${getMonthName(currentMonth)} ${currentYear}`,
+        },
+        tooltip: {
+          callbacks: {
+            title: (day) => {
+              const currentDay = day[0].label;
+              return `${getDayName(`${currentYear}-${currentMonth}-${currentDay}`)}`;
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return chart;
 };

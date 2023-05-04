@@ -2,37 +2,46 @@
 
 import { createWhitelist, getSession, insertSessionData, toggleEditProfile } from './modules/utils.js';
 
+gsap.registerPlugin(ScrollTrigger);
+const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
+
 const session = getSession();
-console.log(session);
+const btnEditProfile = document.querySelector('#editProfile');
 
 const fetchData = async () => {
   const response = await fetch(`http://127.0.0.1:5000/profile/family/${session.familyName}`);
   const jsonData = await response.json();
 
-  const jsonDataKeys = Object.keys(jsonData);
-  const dropdown = document.querySelector('#dropdown');
+  const profile = document.querySelector('svg');
+  const familyNameNav = document.querySelector('#familyNameNav');
+  const familyRoleNav = document.querySelector('#familyRoleNav');
   const firstNameInput = document.querySelector('input#floatingFirstName');
   const lastNameInput = document.querySelector('input#floatingLastName');
   const emailInput = document.querySelector('input#floatingEmail');
   const familyNameInput = document.querySelector('input#floatingFamilyName');
-  const familyNameNav = document.querySelector('#familyNameNav');
-  const familyRoleNav = document.querySelector('#familyRoleNav');
-  jsonDataKeys.forEach((key) => {
-    dropdown.textContent = jsonData[key].first_name;
-    firstNameInput.value = jsonData[key].first_name;
-    lastNameInput.value = jsonData[key].last_name;
-    emailInput.value = jsonData[key].email;
-    familyNameInput.value = jsonData[key].family_name;
-    familyNameNav.textContent = jsonData[key].family_name;
-    familyRoleNav.textContent = jsonData[key].family_role;
-  });
+
+  profile.setAttribute('data-jdenticon-value', session.firstName);
+  familyNameNav.textContent = session.familyName;
+  familyRoleNav.textContent = session.familyRole;
+  firstNameInput.value = session.firstName;
+  lastNameInput.value = session.lastName;
+  emailInput.value = session.email;
+  familyNameInput.value = session.familyName;
+
+  await tl
+    .from('header', { y: '-100%' })
+    .from('.list-group-item', { y: '-100%', stagger: 0.15 })
+    .from('.btn-secondary', { y: '-100%' })
+    .from('.card', { y: '-100%' })
+    .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+    .from('.btn-outline-warning', { y: '-100%' })
+    .from('.btn-outline-danger', { y: '-100%' });
 };
 
 fetchData();
 
-const btnEditProfile = document.querySelector('#editProfile');
 if (btnEditProfile) {
-  btnEditProfile.addEventListener('click', (e) => {
+  btnEditProfile.addEventListener('click', async (e) => {
     const inputs = document.querySelector('form').querySelectorAll('input, select');
     const resetDeleteContainer = document.querySelector('#resetDelete');
 
@@ -44,6 +53,13 @@ if (btnEditProfile) {
         if (input.name !== 'familyName') input.toggleAttribute('disabled');
       }
     });
+
+    await tl
+      .from('.btn-outline-secondary', { y: '-100%' })
+      .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+      .from('.btn-outline-primary', { y: '-100%' })
+      .from('.btn-outline-warning', { y: '-100%' })
+      .from('.btn-outline-danger', { y: '-100%' });
   });
 }
 
