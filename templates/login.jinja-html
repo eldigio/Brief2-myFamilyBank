@@ -1,0 +1,65 @@
+{% extends "base.jinja-html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-md bg-body-tertiary">
+  <div class="container">
+    <a href="/" class="navbar-brand">
+      <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a href="/login" class="btn btn-outline-primary">Login</a>
+        </li>
+        <li class="nav-item">
+          <a href="/sign-up" class="btn btn-outline-info ms-2">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock nav %}
+
+{% block header %}
+<h1 class="text-center text-primary my-4">Login</h1>
+{% endblock header %}
+
+{% block content %}
+<main class="container">
+  <div class="card rounded-4 p-5 shadow-lg border-info-subtle">
+    <form action="/login" method="post" novalidate>
+      <!-- alert -->
+      <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger"></div>
+      <!-- alert return -->
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+      <div class="alert alert-danger alert-dismissible" id="alertError">{{message}}</div>
+      {% endfor %} {% endif %} {% endwith %}
+      <!-- email -->
+      <div class="form-floating mb-3 input" id="email">
+        <input type="email" class="form-control border-primary-subtle rounded-4" id="floatingEmail"
+          placeholder="email@example.com" name="email" autocomplete="off" required />
+        <label for="floatingEmail">Email address</label>
+        <div class="invalid-feedback"></div>
+      </div>
+      <!-- password -->
+      <div class="form-floating mb-5 input" id="password">
+        <input type="password" class="form-control rounded-4 border-primary-subtle" id="floatingPassword"
+          placeholder="Password" name="passwd" required />
+        <label for="floatingPassword">Password</label>
+        <div class="invalid-feedback password"></div>
+      </div>
+      <button type="submit" class="btn btn-outline-primary btn-lg py-3 fs-3 w-100 rounded-4" id="login">
+        Login
+      </button>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script src="{{ url_for('static', filename='login.js') }}" type="module"></script>
+{% endblock content %}

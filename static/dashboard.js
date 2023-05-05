@@ -6,7 +6,6 @@ gsap.registerPlugin(ScrollTrigger);
 const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
 const session = getSession();
-console.table(session);
 
 const fetchData = async () => {
   const response = await fetch(`http://127.0.0.1:5000/profile/family/${session.familyName}`);
@@ -25,9 +24,6 @@ const fetchData = async () => {
     .from('.nav-element', { y: '-100%', stagger: 0.2 })
     .from('header', { y: '-100%' });
   const chart = createChart(jsonData, session);
-
-  // console.log(Object.keys(Chart));
-  // console.log(Chart.defaults);
 };
 
 fetchData();

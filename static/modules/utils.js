@@ -93,13 +93,13 @@ export const validFamilyName = (familyName, invalidFeedback) => {
   return true;
 };
 
-export const showAlert = async (alert, errorMessage) => {
+export const showAlert = async (alert, errorMessage, duration = 0.4) => {
   alert.classList.remove('d-none');
   alert.textContent = errorMessage;
   await gsap.fromTo('.alert-danger', { opacity: 0 }, { opacity: 1, duration, ease: 'power4.out' });
 };
 
-export const hideAlert = async (alert) => {
+export const hideAlert = async (alert, duration = 0.4) => {
   await gsap.fromTo('.alert-danger', { opacity: 1 }, { opacity: 0, duration, ease: 'power4.out' });
   alert.textContent = '';
   alert.classList.add('d-none');

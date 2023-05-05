@@ -26,7 +26,6 @@ const fetchData = async () => {
   await tl
     .from('header', { y: '-100%' })
     .from('.card', { y: '-100%' })
-    .from('#divider', { y: '-100%' })
     .from('.input', { y: '-100%', stagger: (index) => index / 12 })
     .from('.btn-outline-secondary', { y: '-100%' })
     .from('.btn-outline-primary', { y: '-100%' });
@@ -35,7 +34,4 @@ const fetchData = async () => {
 fetchData();
 
 const form = document.querySelector('form');
-form.addEventListener('submit', (e) => {
-  // e.preventDefault();
-  insertSessionData(form, session);
-});
+form.addEventListener('submit', (e) => insertSessionData(form, session));

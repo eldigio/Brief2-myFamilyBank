@@ -1,0 +1,72 @@
+{% extends "base.jinja-html" %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js" async
+  integrity="sha384-yBhgDqxM50qJV5JPdayci8wCfooqvhFYbIKhv0hTtLvfeeyJMJCscRfFNKIxt43M" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock head %}
+
+{% block title %}Dashboard | Family{% endblock title %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container">
+    <a href="/" class="navbar-brand nav-element">
+      <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+    </a>
+    <div class="nav-element d-flex column-gap-3">
+      <div id="familyNameNav" class="fw-bold"></div>
+      <span>-</span>
+      <div class="text-uppercase fw-bold" id="familyRoleNav"></div>
+    </div>
+    <div class="btn-group nav-element">
+      <a href="/profile"><svg width="50" height="50" data-jdenticon-value=""></svg></a>
+    </div>
+  </div>
+</nav>
+{% endblock nav %}
+
+{% block session %}
+<div id="session">
+  <input type="hidden" name="sessionFirstName" value="{{session['firstName']}}" />
+  <input type="hidden" name="sessionLastName" value="{{session['lastName']}}" />
+  <input type="hidden" name="sessionEmail" value="{{session['email']}}" />
+  <input type="hidden" name="sessionFamilyName" value="{{session['family']['name']}}" />
+  <input type="hidden" name="sessionFamilyRole" value="{{session['family']['role']}}" />
+</div>
+{% endblock session %}
+
+
+{% block header %}
+<h1 class="text-center text-primary my-4 ms-5">Family</h1>
+{% endblock header %}
+
+{% block content %}
+<main class="container">
+  <div class="row">
+    <aside class="col-lg-2 py-4 d-flex flex-column" id="resetDelete">
+      <div class="list-group mb-4">
+        <a href="/profile" class="list-group-item list-group-item-action">
+          <i class="bi bi-bank"></i>
+          General</a>
+        <a href="/profile/family" class="list-group-item list-group-item-action active">
+          <i class="bi bi-people"></i>
+          Family</a>
+        <a href="/profile/expense" class="list-group-item list-group-item-action">
+          <i class="bi bi-cash"></i>
+          Expense</a>
+        <a href="/logout" class="list-group-item list-group-item-danger list-group-item-action">
+          <i class="bi bi-box-arrow-left"></i>
+          Logout</a>
+      </div>
+      {% if session["family"]["role"] == "head" %}
+      <button type="button" class="btn btn-secondary w-100 mb-4 text-nowrap" id="editProfile">Edit Profile</button>
+      {% endif %}
+    </aside>
+
+    <section class="col-lg-10 py-4" id="family"></section>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='profile-family.js') }}" type="module" defer></script>
+{% endblock content %}

@@ -1,0 +1,201 @@
+{% extends "base.jinja-html" %} {% block head %}
+<script
+  src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js"
+  async
+  integrity="sha384-yBhgDqxM50qJV5JPdayci8wCfooqvhFYbIKhv0hTtLvfeeyJMJCscRfFNKIxt43M"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+{% endblock head %} {% block title %}Dashboard | Profile{% endblock title %} {% block nav %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container">
+    <a href="/" class="navbar-brand nav-element">
+      <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+    </a>
+    <div class="nav-element d-flex column-gap-3">
+      <div id="familyNameNav" class="fw-bold"></div>
+      <span>-</span>
+      <div class="text-uppercase fw-bold" id="familyRoleNav"></div>
+    </div>
+    <div class="btn-group nav-element">
+      <a href="/profile"><svg width="50" height="50" data-jdenticon-value=""></svg></a>
+    </div>
+  </div>
+</nav>
+{% endblock nav %} {% block session %}
+<div id="session">
+  <input type="hidden" name="sessionFirstName" value="{{ session['firstName'] }}" />
+  <input type="hidden" name="sessionLastName" value="{{ session['lastName'] }}" />
+  <input type="hidden" name="sessionEmail" value="{{ session['email'] }}" />
+  <input type="hidden" name="sessionFamilyName" value="{{ session['family']['name'] }}" />
+  <input type="hidden" name="sessionFamilyRole" value="{{ session['family']['role'] }}" />
+</div>
+{% endblock session %} {% block header %}
+<h1 class="text-center text-primary my-4 ms-5 ps-3">Profile</h1>
+{% endblock header %} {% block content %}
+<main class="container">
+  <div class="row">
+    <aside class="col-lg-2 my-4">
+      <div class="list-group mb-4">
+        <a href="/profile" class="list-group-item list-group-item-action active">
+          <i class="bi bi-bank"></i>
+          General</a
+        >
+        <a href="/profile/family" class="list-group-item list-group-item-action">
+          <i class="bi bi-people"></i>
+          Family</a
+        >
+        <a href="/profile/expense" class="list-group-item list-group-item-action">
+          <i class="bi bi-cash"></i>
+          Expense</a
+        >
+        <a href="/logout" class="list-group-item list-group-item-danger list-group-item-action">
+          <i class="bi bi-box-arrow-left"></i>
+          Logout</a
+        >
+      </div>
+      <button type="button" class="btn btn-secondary w-100 text-nowrap" id="editProfile">Edit Profile</button>
+    </aside>
+
+    <section class="col-lg-10 py-4">
+      <div class="card rounded-4 p-3 shadow-lg border-info-subtle">
+        <form action="/profile" method="post" class="d-flex flex-column gap-3" id="mainForm">
+          <!-- alert -->
+          <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
+            Please fill out the form!
+          </div>
+          <!-- name -->
+          <div class="row" id="name">
+            <!-- firstName -->
+            <div class="col-lg input">
+              <div class="form-floating w-100" id="firstName">
+                <input
+                  type="text"
+                  class="form-control border-primary-subtle rounded-4"
+                  id="floatingFirstName"
+                  placeholder="firstName"
+                  name="firstName"
+                  autocomplete="off"
+                  required
+                  disabled />
+                <label for="floatingFirstName">First Name</label>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <!-- lastName -->
+            <div class="col-lg input">
+              <div class="form-floating" id="lastName">
+                <input
+                  type="text"
+                  class="form-control border-primary-subtle rounded-4"
+                  id="floatingLastName"
+                  placeholder="lastName"
+                  name="lastName"
+                  autocomplete="off"
+                  required
+                  disabled />
+                <label for="floatingLastName">Last Name</label>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+          <!-- email -->
+          <div class="form-floating input" id="email">
+            <input
+              type="email"
+              class="form-control border-primary-subtle rounded-4"
+              id="floatingEmail"
+              placeholder="email@example.com"
+              name="email"
+              autocomplete="off"
+              required
+              disabled />
+            <label for="floatingEmail">Email address</label>
+            <div class="invalid-feedback"></div>
+          </div>
+          <!-- family -->
+          <div class="row" id="family">
+            <!-- name -->
+            <div class="col-lg input">
+              <div class="form-floating" id="familyName">
+                <input
+                  type="text"
+                  class="form-control border-primary-subtle rounded-4"
+                  id="floatingFamilyName"
+                  placeholder="familyName"
+                  name="familyName"
+                  autocomplete="off"
+                  required
+                  readonly />
+                <label for="floatingFamilyName">Family Name</label>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <!-- role -->
+            <div class="col-lg input">
+              <select class="form-select form-select-lg h-100 border-primary-subtle rounded-4" id="familyRole" disabled>
+                {% if session["family"]["role"] == "head" %}
+                <option value="head" selected>Head</option>
+                <option value="member">Member</option>
+                {% else %}
+                <option value="head">Head</option>
+                <option value="member" selected>Member</option>
+                {% endif %}
+              </select>
+              <input type="hidden" name="familyRole" value="{{ session['family']['role'] }}" />
+            </div>
+          </div>
+          <!-- delete -->
+          <div class="d-flex justify-content-between mt-4" id="resetDelete">
+            <!-- delete account btn -->
+            <button
+              type="button"
+              class="ms-auto btn btn-outline-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop">
+              Delete Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="staticBackdrop"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title text-danger" id="staticBackdropLabel">Delete Account</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h2 class="fs-5 text-warning">Are you sure?</h2>
+          <p class="text-warning-emphasis">
+            By confirming you accept that all information with this account will be permanently erased
+          </p>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <form action="/profile/delete" method="post">
+            <input type="hidden" name="firstName" value="{{ session['firstName'] }}" />
+            <input type="hidden" name="lastName" value="{{ session['lastName'] }}" />
+            <input type="hidden" name="email" value="{{ session['email'] }}" />
+            <input type="hidden" name="familyRole" value="{{ session['family']['role'] }}" />
+            <input type="hidden" name="familyName" value="{{ session['family']['name'] }}" />
+            <button type="submit" class="btn btn-danger">Yes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='profile.js') }}" type="module" defer></script>
+{% endblock content %}

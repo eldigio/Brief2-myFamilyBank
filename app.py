@@ -17,13 +17,13 @@ db = client.myfamilybank
 def index():
     if session.get("logged_in"):
         return redirect("/dashboard")
-    return render_template("index.html")
+    return render_template("index.jinja-html")
 
 
 @app.get("/sign-up")
 def get_sign_up():
     if not session.get("logged_in"):
-        return render_template("sign-up.html")
+        return render_template("sign-up.jinja-html")
     return redirect("/dashboard")
 
 
@@ -56,7 +56,7 @@ def post_sign_up():
 @app.get("/login")
 def get_login():
     if not session.get("logged_in"):
-        return render_template("login.html")
+        return render_template("login.jinja-html")
     return redirect("/dashboard")
 
 
@@ -67,6 +67,11 @@ def post_login():
 
     if form_email == "" or form_passwd == "":
         abort(500)
+
+    if form_email == "Admin" and form_passwd == "admin":
+        session["logged_in"] = True
+        session["user"] = "Admin"
+        return redirect("/admin")
 
     user = db.users.find_one({"email": {"$eq": form_email}})
 
@@ -93,7 +98,7 @@ def logout():
 @app.get("/dashboard")
 def dashboard():
     if session.get("logged_in"):
-        return render_template("dashboard.html")
+        return render_template("dashboard.jinja-html")
     return redirect("/login")
 
 
@@ -101,7 +106,7 @@ def dashboard():
 def get_profile():
     global session
     if session.get("logged_in"):
-        return render_template("profile.html")
+        return render_template("dashboard-profile.jinja-html")
     return redirect("/login")
 
 
@@ -143,14 +148,14 @@ def post_profile():
 @app.get("/profile/family")
 def get_profile_family():
     if session.get("logged_in"):
-        return render_template("profile-family.html")
+        return render_template("dashboard-profile-family.jinja-html")
     return redirect("/login")
 
 
 @app.get("/profile/expense")
 def get_expense():
     if session.get("logged_in"):
-        return render_template("dashboard-expense.html")
+        return render_template("dashboard-expense.jinja-html")
     return redirect("/login")
 
 
@@ -171,7 +176,6 @@ def post_expense():
 
     return redirect("/dashboard")
 
-
 @app.get("/profile/family/<string:familyName>")
 def get_family_by_name(familyName):
     users = {}
@@ -188,6 +192,24 @@ def get_family_by_name(familyName):
             }
         })
     return jsonify(users)
+
+@app.post("/profile/delete")
+def delete_profile():
+    db.users.delete_one({
+        "first_name": request.form["firstName"],
+        "last_name": request.form["lastName"],
+        "email": request.form["email"],
+        "family.role": request.form["familyRole"],
+        "family.name": request.form["familyName"],
+    })
+    
+    return redirect("/logout")
+
+@app.get("/admin")
+def get_admin():
+    if session.get("logged_in") and session.get("user") == "Admin":
+        return render_template("admin-dashboard.jinja-html")
+    return redirect("/")
 
 @app.get("/api/all-users")
 def get_all_users():

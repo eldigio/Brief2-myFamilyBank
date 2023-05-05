@@ -33,12 +33,13 @@ const canSubmit = {
   password: { empty: true, valid: false },
   familyName: { empty: true, valid: false },
 };
-
 firstNameContainer.addEventListener('input', (e) => {
   const invalidFeedback = firstNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+
   canSubmit.firstName.empty = false;
   if (!validName(e.target, invalidFeedback)) return;
+
   validInput(e.target);
   canSubmit.firstName.valid = true;
 });
@@ -55,8 +56,10 @@ lastNameContainer.addEventListener('input', (e) => {
 emailContainer.addEventListener('input', (e) => {
   const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+
   canSubmit.email.empty = false;
   if (!validEmail(e.target, invalidFeedback)) return;
+
   validInput(e.target);
   canSubmit.email.valid = true;
 });
@@ -64,8 +67,10 @@ emailContainer.addEventListener('input', (e) => {
 passwordContainer.addEventListener('input', (e) => {
   const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+
   canSubmit.password.empty = false;
   if (!validPassword(e.target, invalidFeedback)) return;
+
   validInput(e.target);
   canSubmit.password.valid = true;
 });
@@ -77,34 +82,24 @@ familyRoleContainer.addEventListener('change', (e) => {
 familyNameContainer.addEventListener('input', (e) => {
   const invalidFeedback = familyNameContainer.querySelector('.invalid-feedback');
   if (isEmpty(e.target)) return;
+
   canSubmit.familyName.empty = false;
   if (!validFamilyName(e.target, invalidFeedback)) return;
+
   validInput(e.target);
   canSubmit.familyName.valid = true;
 });
 
 form.addEventListener('submit', async (e) => {
   const alert = form.querySelector('.alert-danger');
-  if (
-    canSubmit.firstName.empty ||
-    canSubmit.lastName.empty ||
-    canSubmit.email.empty ||
-    canSubmit.password.empty ||
-    canSubmit.familyName.empty
-  ) {
+
+  if (Object.values(canSubmit).every((prop) => prop.empty)) {
     e.preventDefault();
-    flashAlert(alert, 'Please fill out the form');
-    return;
+    return await flashAlert(alert, 'Please fill out the form');
   }
-  if (
-    !canSubmit.firstName.valid ||
-    !canSubmit.lastName.valid ||
-    !canSubmit.email.valid ||
-    !canSubmit.password.valid ||
-    !canSubmit.familyName.valid
-  ) {
+
+  if (!Object.values(canSubmit).every((prop) => prop.valid)) {
     e.preventDefault();
-    flashAlert(alert, 'Invalid credentials');
-    return;
+    return await flashAlert(alert, 'Invalid data');
   }
 });

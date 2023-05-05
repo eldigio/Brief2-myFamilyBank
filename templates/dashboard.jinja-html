@@ -1,0 +1,54 @@
+{% extends "base.jinja-html" %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js" async
+  integrity="sha384-yBhgDqxM50qJV5JPdayci8wCfooqvhFYbIKhv0hTtLvfeeyJMJCscRfFNKIxt43M" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock head %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container">
+    <a href="/" class="navbar-brand nav-element">
+      <img src="https://placehold.co/100x50?text=Logo" alt="" class="img-fluid rounded-4" />
+    </a>
+    <div class="nav-element d-flex column-gap-3">
+      <div id="familyNameNav" class="fw-bold"></div>
+      <span>-</span>
+      <div class="text-uppercase fw-bold" id="familyRoleNav"></div>
+    </div>
+    <div class="btn-group nav-element">
+      <a href="/profile"><svg width="50" height="50" data-jdenticon-value=""></svg></a>
+    </div>
+  </div>
+</nav>
+{% endblock nav %}
+
+{% block session %}
+<div id="session">
+  <input type="hidden" name="sessionFirstName" value="{{session['firstName']}}" />
+  <input type="hidden" name="sessionLastName" value="{{session['lastName']}}" />
+  <input type="hidden" name="sessionEmail" value="{{session['email']}}" />
+  <input type="hidden" name="sessionFamilyName" value="{{session['family']['name']}}" />
+  <input type="hidden" name="sessionFamilyRole" value="{{session['family']['role']}}" />
+</div>
+{% endblock session %}
+
+
+{% block header %}
+<h1 class="text-center text-primary my-4">Dashboard</h1>
+{% endblock header %}
+
+{% block content %}
+<main class="container">
+  <div class="row border border-warning">
+    <div class="col border border-danger">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}" type="module" defer></script>
+{% endblock content %}

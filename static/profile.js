@@ -34,7 +34,6 @@ const fetchData = async () => {
     .from('.btn-secondary', { y: '-100%' })
     .from('.card', { y: '-100%' })
     .from('.input', { y: '-100%', stagger: (index) => index / 12 })
-    .from('.btn-outline-warning', { y: '-100%' })
     .from('.btn-outline-danger', { y: '-100%' });
 };
 
@@ -54,10 +53,17 @@ if (btnEditProfile) {
       }
     });
 
-    await tl
-      .from('.btn-outline-secondary', { y: '-100%' })
+    if (btnEditProfile.classList.contains('btn-outline-secondary')) {
+      return await tl
+        .from('.btn-outline-secondary', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-primary', { y: '-100%' })
+        .from('.btn-outline-warning', { y: '-100%' })
+        .from('.btn-outline-danger', { y: '-100%' });
+    }
+    return await tl
+      .from('.btn-secondary', { y: '-100%' })
       .from('.input', { y: '-100%', stagger: (index) => index / 12 })
-      .from('.btn-outline-primary', { y: '-100%' })
       .from('.btn-outline-warning', { y: '-100%' })
       .from('.btn-outline-danger', { y: '-100%' });
   });
