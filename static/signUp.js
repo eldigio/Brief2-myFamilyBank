@@ -1,8 +1,10 @@
 'use strict';
 
 import {
+  all,
   flashAlert,
   isEmpty,
+  loadAnimation,
   validEmail,
   validFamilyName,
   validInput,
@@ -21,10 +23,7 @@ const passwordContainer = document.querySelector('#password');
 const familyRoleContainer = document.querySelector('#familyRole');
 const familyNameContainer = document.querySelector('#familyName');
 
-tl.from('nav', { y: '-100%' })
-  .from('header', { y: '-125%' })
-  .from('.input', { y: '-100%', stagger: (index) => index / 10 })
-  .from('#signUp', { y: '-100%' });
+loadAnimation(tl, 'signup');
 
 const canSubmit = {
   firstName: { empty: true, valid: false },
@@ -33,11 +32,13 @@ const canSubmit = {
   password: { empty: true, valid: false },
   familyName: { empty: true, valid: false },
 };
+
 firstNameContainer.addEventListener('input', (e) => {
   const invalidFeedback = firstNameContainer.querySelector('.invalid-feedback');
-  if (isEmpty(e.target)) return;
 
+  if (isEmpty(e.target)) return;
   canSubmit.firstName.empty = false;
+
   if (!validName(e.target, invalidFeedback)) return;
 
   validInput(e.target);
@@ -46,18 +47,22 @@ firstNameContainer.addEventListener('input', (e) => {
 
 lastNameContainer.addEventListener('input', (e) => {
   const invalidFeedback = lastNameContainer.querySelector('.invalid-feedback');
+
   if (isEmpty(e.target)) return;
   canSubmit.lastName.empty = false;
+
   if (!validName(e.target, invalidFeedback)) return;
+
   validInput(e.target);
   canSubmit.lastName.valid = true;
 });
 
 emailContainer.addEventListener('input', (e) => {
   const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
-  if (isEmpty(e.target)) return;
 
+  if (isEmpty(e.target)) return;
   canSubmit.email.empty = false;
+
   if (!validEmail(e.target, invalidFeedback)) return;
 
   validInput(e.target);
@@ -66,9 +71,10 @@ emailContainer.addEventListener('input', (e) => {
 
 passwordContainer.addEventListener('input', (e) => {
   const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
-  if (isEmpty(e.target)) return;
 
+  if (isEmpty(e.target)) return;
   canSubmit.password.empty = false;
+
   if (!validPassword(e.target, invalidFeedback)) return;
 
   validInput(e.target);
@@ -81,9 +87,10 @@ familyRoleContainer.addEventListener('change', (e) => {
 
 familyNameContainer.addEventListener('input', (e) => {
   const invalidFeedback = familyNameContainer.querySelector('.invalid-feedback');
-  if (isEmpty(e.target)) return;
 
+  if (isEmpty(e.target)) return;
   canSubmit.familyName.empty = false;
+
   if (!validFamilyName(e.target, invalidFeedback)) return;
 
   validInput(e.target);
@@ -91,15 +98,13 @@ familyNameContainer.addEventListener('input', (e) => {
 });
 
 form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
   const alert = form.querySelector('.alert-danger');
 
-  if (Object.values(canSubmit).every((prop) => prop.empty)) {
-    e.preventDefault();
-    return await flashAlert(alert, 'Please fill out the form');
-  }
+  if (all(canSubmit, 'empty')) return await flashAlert(alert, 'Please fill out the form');
 
-  if (!Object.values(canSubmit).every((prop) => prop.valid)) {
-    e.preventDefault();
-    return await flashAlert(alert, 'Invalid data');
-  }
+  if (!all(canSubmit, 'valid')) return await flashAlert(alert, 'Invalid form data');
+
+  form.submit();
 });

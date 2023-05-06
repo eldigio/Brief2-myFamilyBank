@@ -1,12 +1,20 @@
 'use strict';
 
-import { createFamilyHTML, createWhitelist, getSession, toggleEditProfile } from './modules/utils.js';
+import {
+  allDisabled,
+  createFamilyHTML,
+  createWhitelist,
+  getSession,
+  loadAnimation,
+  setNavData,
+  toggleEditProfile,
+} from './modules/utils.js';
 
 gsap.registerPlugin(ScrollTrigger);
 const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
 const session = getSession();
-console.log(session);
+setNavData(session);
 
 const fetchData = async () => {
   const familyContainer = document.querySelector('#family');
@@ -15,22 +23,12 @@ const fetchData = async () => {
   const jsonData = await response.json();
 
   const jsonDataKeys = Object.keys(jsonData);
-  const profile = document.querySelector('svg');
-  const familyNameNav = document.querySelector('#familyNameNav');
-  const familyRoleNav = document.querySelector('#familyRoleNav');
   jsonDataKeys.forEach((key, index) => {
-    profile.setAttribute('data-jdenticon-value', session.firstName);
-    familyNameNav.textContent = session.familyName;
-    familyRoleNav.textContent = session.familyRole;
     const htmlMarkup = createFamilyHTML(jsonData, key, jsonDataKeys, index);
     familyContainer.insertAdjacentHTML('beforeend', htmlMarkup);
   });
 
-  await tl
-    .from('header', { y: '-100%' })
-    .from('.card', { y: '-100%' })
-    .from('#divider', { y: '-100%' })
-    .from('.input', { y: '-100%', stagger: (index) => index / 12 });
+  loadAnimation(tl, 'dashboard-family');
 };
 
 fetchData();
@@ -45,22 +43,11 @@ if (btnEditProfile) {
 
     forms.forEach((form) => {
       const inputs = form.querySelectorAll('input, select');
-
-      inputs.forEach((input) => {
-        if (whitelist.some((value) => input.name.includes(value))) {
-          input.toggleAttribute('disabled');
-        }
-      });
+      allDisabled(inputs, whitelist);
     });
 
-    if (document.querySelector('.btn-outline-primary'))
-      return await tl
-        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
-        .from('.btn-outline-secondary', { y: '-100%' })
-        .from('.btn-outline-primary', { y: '-100%' });
+    if (document.querySelector('.btn-outline-primary')) return await loadAnimation(tl, 'dashboard-family-edit');
 
-    return await tl
-      .from('.input', { y: '-100%', stagger: (index) => index / 12 })
-      .from('.btn-secondary', { y: '-100%' });
+    return await loadAnimation(tl, 'dashboard-family-reload');
   });
 }

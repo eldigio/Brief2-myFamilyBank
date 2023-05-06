@@ -240,61 +240,306 @@ export const getAllDaysInMonth = (year, month) => {
   return dayArray;
 };
 
-export const getUsersChartDataset = (jsonData, sessionFirstName, sessionLastName, year, month) => {
-  const datasets = [];
-  jsonData.forEach((user, index) => {
-    datasets.push({ label: user.first_name, data: new Array(31).fill(0) });
-
-    // if (user.first_name === sessionFirstName && user.last_name === sessionLastName) {
-    [...user.amount].forEach((amount) => {
-      const expenseYear = amount.date.split('-')[0] * 1;
-      const expenseMonth = amount.date.split('-')[1] * 1;
-      const expenseDay = amount.date.split('-')[2] * 1;
-      if (month === expenseMonth && year === expenseYear) {
-        datasets[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
-        datasets[index].data[expenseDay - 1] += amount.amount * 1;
-      }
-    });
-    // }
-  });
-  return datasets /*.filter((dataset) => dataset.label === sessionFirstName)*/;
+export const formatValue = (value) => {
+  return value
+    .replace(/,/g, ' ')
+    .trim()
+    .split(' ')
+    .filter((elem, index, self) => index === self.indexOf(elem))[0];
 };
 
-export const createChart = (jsonData, session) => {
+export const getUniqueCategories = (jsonData) => {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  let categorySet = new Set();
+  const categories = getUsersChartDataset(jsonData, currentYear, currentMonth).categories;
+  categories.forEach((data) => {
+    data.data.forEach((value) => {
+      if (value !== '') categorySet.add(formatValue(value));
+    });
+  });
+  return [...categorySet];
+};
+
+export const getUsersChartDataset = (jsonData, year, month) => {
+  const amounts = [];
+  const categories = [];
+  jsonData.forEach((user, index) => {
+    amounts.push({ label: user.first_name, data: new Array(31).fill(0) });
+    categories.push({ label: user.first_name, data: new Array(31).fill('') });
+
+    [...user.expenses].forEach((expense) => {
+      const expenseYear = expense.date.split('-')[0] * 1;
+      const expenseMonth = expense.date.split('-')[1] * 1;
+      const expenseDay = expense.date.split('-')[2] * 1;
+      if (month === expenseMonth && year === expenseYear) {
+        amounts[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
+        categories[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
+        amounts[index].data[expenseDay - 1] += expense.amount * 1;
+        categories[index].data[expenseDay - 1] += `${expense.category},`;
+      }
+    });
+  });
+  return { amounts, categories };
+};
+
+export const getPieChartDataset = (jsonData, year, month) => {
+  const uniqueCategories = getUniqueCategories(jsonData);
+  let dataset = new Object();
+
+  uniqueCategories.forEach((category) => (dataset[category] = 0));
+
+  jsonData.forEach((user) => {
+    [...user.expenses].forEach((expense) => (dataset[expense.category] += expense.amount * 1));
+  });
+
+  return [{ data: Object.values(dataset) }];
+};
+
+export const createChart = (jsonData, session, type) => {
   const ctx = document.querySelector('#chart');
+  const ctxPie = document.querySelector('#pie');
 
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
-  const chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      datasets: getUsersChartDataset(jsonData, session.firstName, session.lastName, currentYear, currentMonth),
-      labels: getAllDaysInMonth(currentYear, currentMonth),
-    },
-    responsive: true,
-    options: {
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true },
-      },
-      plugins: {
-        title: {
-          display: true,
-          text: `${getMonthName(currentMonth)} ${currentYear}`,
+  let chart;
+
+  switch (type) {
+    case 'bar':
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: getAllDaysInMonth(currentYear, currentMonth),
+          datasets: getUsersChartDataset(jsonData, currentYear, currentMonth).amounts,
         },
-        tooltip: {
-          callbacks: {
-            title: (day) => {
-              const currentDay = day[0].label;
-              return `${getDayName(`${currentYear}-${currentMonth}-${currentDay}`)}`;
+        responsive: true,
+        options: {
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true },
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `${getMonthName(currentMonth)} ${currentYear}`,
+            },
+            tooltip: {
+              callbacks: {
+                title: (day) => {
+                  const currentDay = day[0].label;
+                  return `${getDayName(`${currentYear}-${currentMonth}-${currentDay}`)}`;
+                },
+                label: (context) => {
+                  const NUMBER_FORMATTER = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
+                  return context.dataset.label + ': ' + NUMBER_FORMATTER.format(context.parsed.y);
+                },
+                footer: (context) => {
+                  let categoryArr = [];
+                  const categories = getUsersChartDataset(jsonData, currentYear, currentMonth).categories;
+                  categories.forEach((data) => {
+                    if (data.label === context[0].dataset.label) {
+                      categoryArr.push(data.data[context[0].dataIndex].replace(/,/g, ' ').trim());
+                    }
+                  });
+
+                  const value = categoryArr[0].split(' ').filter((elem, index, self) => index === self.indexOf(elem));
+                  return value;
+                },
+              },
             },
           },
         },
-      },
-    },
-  });
+      });
+      break;
+    case 'pie':
+      chart = new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+          labels: getUniqueCategories(jsonData),
+          datasets: getPieChartDataset(jsonData, currentYear, currentMonth),
+        },
+        responsive: true,
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: `${getMonthName(currentMonth)} ${currentYear}`,
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const NUMBER_FORMATTER = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
+                  return 'Total: ' + NUMBER_FORMATTER.format(context.parsed);
+                },
+              },
+            },
+          },
+        },
+        plugins: {},
+      });
+      break;
+  }
 
   return chart;
+};
+
+export const loadAnimationSignUp = (tl) => {};
+
+export const loadAnimation = async (tl, name) => {
+  switch (name) {
+    case 'login':
+      await tl
+        .from('nav', { y: '-100%' })
+        .from('header', { y: '-125%' })
+        .from('.card', { y: '-50%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('#login', { y: '-100%', duration: 0.2 });
+      break;
+    case 'login-error':
+      await tl
+        .from('nav', { y: '-100%' })
+        .from('header', { y: '-125%' })
+        .from('#alertError', { y: '-100%' })
+        .from('#email', { y: '-100%' })
+        .from('#password', { y: '-100%' })
+        .from('#login', { y: '-100%' });
+      break;
+    case 'signup':
+      await tl
+        .from('nav', { y: '-100%' })
+        .from('header', { y: '-125%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 10 })
+        .from('#signUp', { y: '-100%' });
+      break;
+    case 'dashboard':
+      await tl
+        .from('nav', { y: '-100%' })
+        .from('.nav-element', { y: '-100%', stagger: 0.2 })
+        .from('header', { y: '-100%' })
+        .from('.card', { y: '-100%', stagger: 0.2 });
+      break;
+    case 'dashboard-profile':
+      await tl
+        .from('header', { y: '-100%' })
+        .from('.list-group-item', { y: '-100%', stagger: 0.15 })
+        .from('.btn-secondary', { y: '-100%' })
+        .from('.card', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-danger', { y: '-100%' });
+      break;
+    case 'dashboard-profile-edit':
+      await tl
+        .from('.btn-outline-secondary', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-primary', { y: '-100%' })
+        .from('.btn-outline-warning', { y: '-100%' })
+        .from('.btn-outline-danger', { y: '-100%' });
+      break;
+    case 'dashboard-profile-reload':
+      await tl
+        .from('.btn-secondary', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-warning', { y: '-100%' })
+        .from('.btn-outline-danger', { y: '-100%' });
+      break;
+    case 'dashboard-family':
+      await tl
+        .from('header', { y: '-100%' })
+        .from('.card', { y: '-100%' })
+        .from('#divider', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 });
+      break;
+    case 'dashboard-family-edit':
+      await tl
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-secondary', { y: '-100%' })
+        .from('.btn-outline-primary', { y: '-100%' });
+      break;
+    case 'dashboard-family-reload':
+      await tl.from('.input', { y: '-100%', stagger: (index) => index / 12 }).from('.btn-secondary', { y: '-100%' });
+      break;
+    case 'dashboard-expense':
+      await tl
+        .from('header', { y: '-100%' })
+        .from('.card', { y: '-100%' })
+        .from('.input', { y: '-100%', stagger: (index) => index / 12 })
+        .from('.btn-outline-secondary', { y: '-100%' })
+        .from('.btn-outline-primary', { y: '-100%' });
+      break;
+  }
+};
+
+export const errorAnimationLogin = (tl) => {};
+
+export const all = (obj, key) => {
+  return Object.values(obj).every((prop) => prop[key]);
+};
+
+export const allDisabled = (inputs, whitelist) => {
+  inputs.forEach((input) => {
+    if (whitelist.some((value) => input.name.includes(value))) {
+      if (input.name !== 'familyName') input.toggleAttribute('disabled');
+    }
+  });
+};
+
+export const setNavData = (session) => {
+  document.querySelector('svg').setAttribute('data-jdenticon-value', session.firstName);
+  document.querySelector('#familyNameNav').textContent = session.familyName;
+  document.querySelector('#familyRoleNav').textContent = session.familyRole;
+};
+
+export const setInputsData = (session) => {
+  document.querySelector('input#floatingFirstName').value = session.firstName;
+  document.querySelector('input#floatingLastName').value = session.lastName;
+  document.querySelector('input#floatingEmail').value = session.email;
+  document.querySelector('input#floatingFamilyName').value = session.familyName;
+};
+
+export const isAdmin = async (user, passwd) => {
+  const userInput = user.children.email.value;
+  const passwdInput = passwd.children.passwd.value;
+
+  const response = await fetch('http://127.0.0.1:5000/api/all-admins');
+  const json = await response.json();
+
+  return json.some((admin) => admin.user === userInput && admin.passwd === passwdInput);
+};
+
+export const createTableRow = (user) => {
+  const tr = document.createElement('tr');
+  const tdId = document.createElement('td');
+  tdId.textContent = user.id;
+  tdId.classList = 'text-truncate';
+  tdId.style.maxWidth = '8ch';
+  const tdFirstName = document.createElement('td');
+  tdFirstName.textContent = user.first_name;
+  tdFirstName.classList = 'text-truncate';
+  tdFirstName.style.maxWidth = '8ch';
+  const tdLastName = document.createElement('td');
+  tdLastName.textContent = user.last_name;
+  tdLastName.classList = 'text-truncate';
+  tdLastName.style.maxWidth = '8ch';
+  const tdEmail = document.createElement('td');
+  tdEmail.textContent = user.email;
+  tdEmail.classList = 'text-truncate';
+  tdEmail.style.maxWidth = '16ch';
+  const tdFamilyRole = document.createElement('td');
+  tdFamilyRole.textContent = user.family_role;
+  const tdFamilyName = document.createElement('td');
+  tdFamilyName.textContent = user.family_name;
+  tdFamilyName.classList = 'text-truncate';
+  tdFamilyName.style.maxWidth = '8ch';
+  const tdUpdate = document.createElement('td');
+  tdUpdate.insertAdjacentHTML('afterbegin', `<i class="bi bi-pen btn btn-outline-warning"></i>`);
+  const tdDelete = document.createElement('td');
+  tdDelete.insertAdjacentHTML('afterbegin', `<i class="bi bi-trash3 btn btn-outline-danger"></i>`);
+
+  tr.append(tdId, tdFirstName, tdLastName, tdEmail, tdFamilyRole, tdFamilyName, tdUpdate, tdDelete);
+
+  return tr;
 };

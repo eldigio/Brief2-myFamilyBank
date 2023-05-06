@@ -68,12 +68,26 @@
           <div class="alert alert-danger alert-dismissible d-none" role="alert" id="alertDanger">
             Please fill out the form!
           </div>
-          <!-- amount -->
-          <div class="form-floating input" id="amount">
-            <input type="number" class="form-control" id="floatingAmount" placeholder="amount" name="amount"
-              autocomplete="off" required />
-            <label for="floatingAmount">Expense Amount</label>
-            <div class="invalid-feedback"></div>
+          <!-- amount/category -->
+          <div class="row">
+            <!-- amount -->
+            <div class="col-lg">
+              <div class="form-floating input" id="amount">
+                <input type="number" class="form-control" id="floatingAmount" placeholder="amount" name="amount"
+                  autocomplete="off" required />
+                <label for="floatingAmount">Expense Amount</label>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+            <!-- category -->
+            <div class="col-lg">
+              <div class="form-floating input" id="category">
+                <input type="text" class="form-control" id="floatingCategory" placeholder="category" name="category"
+                  autocomplete="off" required />
+                <label for="floatingCategory">Expense Category</label>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
           </div>
           <!-- family/expense date -->
           <div class="row">

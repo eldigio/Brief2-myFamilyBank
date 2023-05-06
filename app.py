@@ -46,7 +46,7 @@ def post_sign_up():
             "family": {
                 "role": family_role, "name": family_name
             },
-            "amounts": []
+            "expenses": []
         }
     )
 
@@ -67,11 +67,6 @@ def post_login():
 
     if form_email == "" or form_passwd == "":
         abort(500)
-
-    if form_email == "Admin" and form_passwd == "admin":
-        session["logged_in"] = True
-        session["user"] = "Admin"
-        return redirect("/admin")
 
     user = db.users.find_one({"email": {"$eq": form_email}})
 
@@ -168,13 +163,15 @@ def post_expense():
     family_role = request.form["sessionFamilyRole"]
     first_name = request.form["sessionFirstName"]
     last_name = request.form["sessionLastName"]
+    category = request.form["category"]
 
     db.users.update_one(
         {"first_name": first_name, "last_name": last_name, "email": email},
-        {"$push": {"amounts": {"amount": amount, "date": date}}}
+        {"$push": {"expenses": {"category": category, "amount": amount, "date": date}}}
     )
 
     return redirect("/dashboard")
+
 
 @app.get("/profile/family/<string:familyName>")
 def get_family_by_name(familyName):
@@ -188,10 +185,11 @@ def get_family_by_name(familyName):
                 "email": user["email"],
                 "family_role": user["family"]["role"],
                 "family_name": user["family"]["name"],
-                "amount": user["amounts"],
+                "expenses": user["expenses"],
             }
         })
     return jsonify(users)
+
 
 @app.post("/profile/delete")
 def delete_profile():
@@ -202,27 +200,53 @@ def delete_profile():
         "family.role": request.form["familyRole"],
         "family.name": request.form["familyName"],
     })
-    
+
     return redirect("/logout")
+
 
 @app.get("/admin")
 def get_admin():
-    if session.get("logged_in") and session.get("user") == "Admin":
-        return render_template("admin-dashboard.jinja-html")
-    return redirect("/")
+    return render_template("admin-dashboard.jinja-html")
+
 
 @app.get("/api/all-users")
 def get_all_users():
     users = {}
     result = db.users.find({}, {"email": 1})
-    for i, user in  enumerate(result):
+    for i, user in enumerate(result):
         users.update({
-            f"{i}": {
-                "email": user["email"],
-            }
+            f"{i}": {"email": user["email"]}
         })
-    
+
     return jsonify(users)
+
+
+@app.get("/api/admin/all-users")
+def get_all_users_admin():
+    users = []
+    result = db.users.find({})
+    for user in result:
+        users.append({
+            "id": str(user["_id"]),
+            "email": user["email"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "family_role": user["family"]["role"],
+            "family_name": user["family"]["name"],
+        })
+
+    return jsonify(users)
+
+
+@app.get("/api/all-admins")
+def get_all_admins():
+    admins = []
+    result = db.admins.find({}, {"user": 1, "passwd": 1})
+    for admin in result:
+        admins.append({"user": admin["user"], "passwd": admin["passwd"]})
+
+    return jsonify(admins)
+
 
 @app.get("/500")
 def error_500():

@@ -43,9 +43,16 @@
 
 {% block content %}
 <main class="container">
-  <div class="row border border-warning">
-    <div class="col border border-danger">
-      <canvas id="chart"></canvas>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card rounded-4 p-2 shadow border-info-subtle h-100">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card rounded-4 p-2 shadow border-info-subtle h-100">
+        <canvas id="pie" class="mx-auto"></canvas>
+      </div>
     </div>
   </div>
 </main>
