@@ -29,14 +29,6 @@ export const validInput = (input) => {
   input.classList.add('is-valid');
 };
 
-export const validName = (name, invalidFeedback) => {
-  if (name.value.match(/[0-9]/)) {
-    invalidInput(name, invalidFeedback, 'Cannot contain numbers');
-    return false;
-  }
-  return true;
-};
-
 export const isEmpty = (input) => {
   if (input.value === '') {
     defaultInput(input);
@@ -45,52 +37,57 @@ export const isEmpty = (input) => {
   return false;
 };
 
-export const validEmail = (email, invalidFeedback) => {
-  if (!email.value.match(emailRegex)) {
-    invalidInput(email, invalidFeedback, 'Invalid Email Address');
-    return false;
+export const isValid = (input, invalidFeedback, type) => {
+  switch (type) {
+    case 'name':
+      if (input.value.match(/[0-9]/)) {
+        invalidInput(input, invalidFeedback, 'Cannot contain numbers');
+        return false;
+      }
+      return true;
+    case 'email':
+      if (!input.value.match(emailRegex)) {
+        invalidInput(input, invalidFeedback, 'Invalid Email Address');
+        return false;
+      }
+      return true;
+    case 'password':
+      if (input.value.length < 8) {
+        invalidInput(input, invalidFeedback, 'Password must be more than 8 characters');
+        return false;
+      }
+      if (input.value.length > 128) {
+        invalidInput(input, invalidFeedback, 'Password must be less than 128 characters');
+        return false;
+      }
+      if (!input.value.match(/[a-z]/)) {
+        invalidInput(input, invalidFeedback, 'Password must contain a lowercase character');
+        return false;
+      }
+      if (!input.value.match(/[A-Z]/)) {
+        invalidInput(input, invalidFeedback, 'Password must contain a uppercase character');
+        return false;
+      }
+      if (!input.value.match(/[0-9]/)) {
+        invalidInput(input, invalidFeedback, 'Password must contain a number');
+        return false;
+      }
+      if (!input.value.match(/(?![a-z0-9])\S/gi)) {
+        invalidInput(input, invalidFeedback, 'Password must contain a special character');
+        return false;
+      }
+      return true;
+    case 'familyName':
+      if (input.value.length < 4) {
+        invalidInput(input, invalidFeedback, 'Family name must be more than 4 characters');
+        return false;
+      }
+      if (input.value.length > 16) {
+        invalidInput(input, invalidFeedback, 'Family name must be less than 16 characters');
+        return false;
+      }
+      return true;
   }
-  return true;
-};
-
-export const validPassword = (password, invalidFeedback) => {
-  if (password.value.length < 8) {
-    invalidInput(password, invalidFeedback, 'Password must be more than 8 characters');
-    return false;
-  }
-  if (password.value.length > 128) {
-    invalidInput(password, invalidFeedback, 'Password must be less than 128 characters');
-    return false;
-  }
-  if (!password.value.match(/[a-z]/)) {
-    invalidInput(password, invalidFeedback, 'Password must contain a lowercase character');
-    return false;
-  }
-  if (!password.value.match(/[A-Z]/)) {
-    invalidInput(password, invalidFeedback, 'Password must contain a uppercase character');
-    return false;
-  }
-  if (!password.value.match(/[0-9]/)) {
-    invalidInput(password, invalidFeedback, 'Password must contain a number');
-    return false;
-  }
-  if (!password.value.match(/(?![a-z0-9])\S/gi)) {
-    invalidInput(password, invalidFeedback, 'Password must contain a special character');
-    return false;
-  }
-  return true;
-};
-
-export const validFamilyName = (familyName, invalidFeedback) => {
-  if (familyName.value.length < 4) {
-    invalidInput(familyName, invalidFeedback, 'Family name must be more than 4 characters');
-    return false;
-  }
-  if (familyName.value.length > 16) {
-    invalidInput(familyName, invalidFeedback, 'Family name must be less than 16 characters');
-    return false;
-  }
-  return true;
 };
 
 export const showAlert = async (alert, errorMessage, duration = 0.4) => {
@@ -501,45 +498,122 @@ export const setInputsData = (session) => {
 };
 
 export const isAdmin = async (user, passwd) => {
-  const userInput = user.children.email.value;
-  const passwdInput = passwd.children.passwd.value;
-
   const response = await fetch('http://127.0.0.1:5000/api/all-admins');
   const json = await response.json();
 
-  return json.some((admin) => admin.user === userInput && admin.passwd === passwdInput);
+  return json.some((admin) => admin.user === user && admin.passwd === passwd);
 };
 
 export const createTableRow = (user) => {
   const tr = document.createElement('tr');
   const tdId = document.createElement('td');
-  tdId.textContent = user.id;
-  tdId.classList = 'text-truncate';
+  tdId.insertAdjacentHTML(
+    'afterbegin',
+    `<input type="text" class="form-control-plaintext text-truncate" name="id" value="${user.id}" readonly />`
+  );
   tdId.style.maxWidth = '8ch';
+  tdId.id = 'id';
   const tdFirstName = document.createElement('td');
-  tdFirstName.textContent = user.first_name;
-  tdFirstName.classList = 'text-truncate';
-  tdFirstName.style.maxWidth = '8ch';
+  tdFirstName.insertAdjacentHTML(
+    'afterbegin',
+    `<input type="text" class="form-control text-truncate" name="first_name" value="${user.first_name}" disabled />`
+  );
+  tdFirstName.style.maxWidth = '10ch';
+  tdFirstName.id = 'firstName';
   const tdLastName = document.createElement('td');
-  tdLastName.textContent = user.last_name;
-  tdLastName.classList = 'text-truncate';
-  tdLastName.style.maxWidth = '8ch';
+  tdLastName.insertAdjacentHTML(
+    'afterbegin',
+    `<input type="text" class="form-control text-truncate" name="last_name" value="${user.last_name}" disabled />`
+  );
+  tdLastName.style.maxWidth = '10ch';
+  tdLastName.id = 'lastName';
   const tdEmail = document.createElement('td');
-  tdEmail.textContent = user.email;
-  tdEmail.classList = 'text-truncate';
+  tdEmail.insertAdjacentHTML(
+    'afterbegin',
+    `<input type="text" class="form-control-plaintext text-truncate" name="email" value="${user.email}" readonly />`
+  );
   tdEmail.style.maxWidth = '16ch';
+  tdEmail.id = 'email';
   const tdFamilyRole = document.createElement('td');
-  tdFamilyRole.textContent = user.family_role;
+  tdFamilyRole.insertAdjacentHTML(
+    'afterbegin',
+    `
+    <select type="text" class="form-select" name="family_role" disabled>
+      <option value="head" ${user.family_role === 'head' ? 'selected' : ''}>Head</option>
+      <option value="member" ${user.family_role === 'member' ? 'selected' : ''}>Member</option>
+    </select>`
+  );
+  tdFamilyRole.id = 'familyRole';
   const tdFamilyName = document.createElement('td');
-  tdFamilyName.textContent = user.family_name;
-  tdFamilyName.classList = 'text-truncate';
+  tdFamilyName.insertAdjacentHTML(
+    'afterbegin',
+    `<input type="text" class="form-control text-truncate" name="family_name" value="${user.family_name}" disabled />`
+  );
   tdFamilyName.style.maxWidth = '8ch';
-  const tdUpdate = document.createElement('td');
-  tdUpdate.insertAdjacentHTML('afterbegin', `<i class="bi bi-pen btn btn-outline-warning"></i>`);
-  const tdDelete = document.createElement('td');
-  tdDelete.insertAdjacentHTML('afterbegin', `<i class="bi bi-trash3 btn btn-outline-danger"></i>`);
+  tdFamilyName.id = 'familyName';
+  const tdActions = document.createElement('td');
+  tdActions.insertAdjacentHTML(
+    'afterbegin',
+    `
+    <div class="row gx-3">
+      <div class="col-6">
+        <i class="bi bi-pen btn btn-outline-warning" id="edit"></i>
+      </div>
+      <div class="col-6">
+      <form action="/admin/delete" method="post">
+      <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash3" id="delete"></i></button>
+      <input type="hidden" name="id" value="${user.id}" />
+      </form>
+      </div>
+    </div>
+    `
+  );
+  tdActions.id = 'actions';
 
-  tr.append(tdId, tdFirstName, tdLastName, tdEmail, tdFamilyRole, tdFamilyName, tdUpdate, tdDelete);
+  tr.append(tdId, tdFirstName, tdLastName, tdEmail, tdFamilyRole, tdFamilyName, tdActions);
 
   return tr;
+};
+
+export const createTable = (json, tbody) => {
+  document.querySelector('tbody').innerHTML = '';
+  json.forEach((user) => {
+    const tr = createTableRow(user);
+    tbody.appendChild(tr);
+  });
+};
+
+export const toggleDisabledInput = (tr, type, json, tbody) => {
+  switch (type) {
+    case 'edit':
+      tr.cells.firstName.firstChild.toggleAttribute('disabled');
+      tr.cells.lastName.firstChild.toggleAttribute('disabled');
+      tr.cells.familyRole.children[0].toggleAttribute('disabled');
+      tr.cells.familyName.firstChild.toggleAttribute('disabled');
+      tr.cells.actions.querySelector('#edit').remove();
+      tr.cells.actions.firstElementChild.firstElementChild.insertAdjacentHTML(
+        'afterbegin',
+        `<i class="bi bi-x-lg btn btn-outline-secondary" id="cancel"></i>`
+      );
+      tr.cells.actions.querySelector('#delete').remove();
+      tr.cells.actions.firstElementChild.lastElementChild.insertAdjacentHTML(
+        'afterbegin',
+        `
+        <form action="/admin" method="post">
+          <button type="submit" class="btn btn-outline-primary"><i class="bi bi-check-lg" id="save"></i></button>
+          <input type="hidden" name="id" value="${tr.cells.id.firstChild.value}" />
+          <input type="hidden" name="first_name" value="${tr.cells.firstName.firstChild.value}" />
+          <input type="hidden" name="last_name" value="${tr.cells.lastName.firstChild.value}" />
+          <input type="hidden" name="family_role" value="${
+            tr.cells.familyRole.firstElementChild.options[tr.cells.familyRole.firstElementChild.selectedIndex].value
+          }" />
+          <input type="hidden" name="family_name" value="${tr.cells.familyName.firstChild.value}" />
+        </form>
+        `
+      );
+      break;
+    case 'cancel':
+      createTable(json, tbody);
+      break;
+  }
 };

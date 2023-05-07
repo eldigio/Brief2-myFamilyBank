@@ -1,6 +1,6 @@
 'use strict';
 
-import { all, flashAlert, isEmpty, loadAnimation, validEmail, validInput, validPassword } from './modules/utils.js';
+import { all, flashAlert, isEmpty, isValid, loadAnimation, validInput } from './modules/utils.js';
 
 gsap.registerPlugin(ScrollTrigger);
 const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
@@ -15,27 +15,30 @@ const passwordContainer = document.querySelector('#password');
 
 const canSubmit = { email: { empty: true, valid: false }, password: { empty: true, valid: false } };
 
-emailContainer.addEventListener('input', (e) => {
-  const invalidFeedback = emailContainer.querySelector('.invalid-feedback');
+form.addEventListener('input', (e) => {
+  const target = e.target;
+  const invalidFeedback = target.nextElementSibling.nextElementSibling;
 
-  if (isEmpty(e.target)) return;
-  canSubmit.email.empty = false;
+  switch (target.name) {
+    case 'email':
+      if (isEmpty(target)) return;
+      canSubmit.email.empty = false;
 
-  if (!validEmail(e.target, invalidFeedback)) return;
+      if (!isValid(target, invalidFeedback, 'email')) return;
 
-  validInput(e.target);
-  canSubmit.email.valid = true;
-});
+      validInput(target);
+      canSubmit.email.valid = true;
+      break;
+    case 'passwd':
+      if (isEmpty(target)) return;
+      canSubmit.password.empty = false;
 
-passwordContainer.addEventListener('input', (e) => {
-  const invalidFeedback = passwordContainer.querySelector('.invalid-feedback');
-  if (isEmpty(e.target)) return;
-  canSubmit.password.empty = false;
+      if (!isValid(target, invalidFeedback, 'password')) return;
 
-  if (!validPassword(e.target, invalidFeedback)) return;
-
-  validInput(e.target);
-  canSubmit.password.valid = true;
+      validInput(target);
+      canSubmit.password.valid = true;
+      break;
+  }
 });
 
 form.addEventListener('submit', async (e) => {

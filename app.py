@@ -206,7 +206,55 @@ def delete_profile():
 
 @app.get("/admin")
 def get_admin():
-    return render_template("admin-dashboard.jinja-html")
+    if session.get("admin"):
+        return render_template("admin-dashboard.jinja-html")
+    return redirect("/admin/login")
+
+
+@app.post("/admin")
+def post_admin():
+    from bson import ObjectId
+
+    db.users.update_one({"_id": ObjectId(request.form["id"])}, {
+        "$set": {
+            "first_name": request.form["first_name"],
+            "last_name": request.form["last_name"],
+            "family.role": request.form["family_role"],
+            "family.name": request.form["family_name"],
+        }
+    })
+
+    return redirect("/admin")
+
+
+@app.post("/admin/delete")
+def post_admin_delete():
+    from bson import ObjectId
+    db.users.delete_one({"_id": ObjectId(request.form["id"])})
+
+    return redirect("/admin")
+
+
+@app.get("/admin/login")
+def get_admin_login():
+    if session.get("admin"):
+        return redirect("/admin")
+    return render_template("admin-login.jinja-html")
+
+
+@app.post("/admin/login")
+def post_admin_login():
+    session["admin"] = True
+    session["user"] = request.form["user"]
+    session["passwd"] = request.form["passwd"]
+
+    return redirect("/admin")
+
+
+@app.get("/admin/logout")
+def get_admin_logout():
+    session.clear()
+    return redirect("/")
 
 
 @app.get("/api/all-users")
