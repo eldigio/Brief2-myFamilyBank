@@ -103,7 +103,7 @@
             <!-- expense date -->
             <div class="col-lg">
               <div class="form-floating input" id="expenseDate">
-                <input type="date" class="form-control" id="floatingExpenseDate" placeholder="expenseDate" name="date"
+                <input type="datetime-local" class="form-control" id="floatingExpenseDate" placeholder="expenseDate" name="date"
                   required />
                 <label for="floatingExpenseDate">Expense Date</label>
                 <div class="invalid-feedback"></div>

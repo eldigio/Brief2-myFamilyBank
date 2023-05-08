@@ -215,14 +215,30 @@ def get_admin():
 def post_admin():
     from bson import ObjectId
 
-    db.users.update_one({"_id": ObjectId(request.form["id"])}, {
-        "$set": {
-            "first_name": request.form["first_name"],
-            "last_name": request.form["last_name"],
-            "family.role": request.form["family_role"],
-            "family.name": request.form["family_name"],
-        }
-    })
+    if request.form["amount"] and request.form["category"] and request.form["date"]:
+        db.users.update_one({
+            "_id": ObjectId(request.form["id"]),
+            "expenses.category": request.form["old_category"],
+            "expenses.amount": request.form["old_amount"],
+            "expenses.date": request.form["old_date"],
+        }, {
+            "$set": {
+                "first_name": request.form["first_name"],
+                "last_name": request.form["last_name"],
+                "expenses.$.category": request.form["category"],
+                "expenses.$.amount": request.form["amount"],
+                "expenses.$.date": request.form["date"],
+            }
+        })
+    else:
+        db.users.update_one({"_id": ObjectId(request.form["id"])}, {
+            "$set": {
+                "first_name": request.form["first_name"],
+                "last_name": request.form["last_name"],
+                "family.role": request.form["family_role"],
+                "family.name": request.form["family_name"],
+            }
+        })
 
     return redirect("/admin")
 
@@ -230,7 +246,18 @@ def post_admin():
 @app.post("/admin/delete")
 def post_admin_delete():
     from bson import ObjectId
-    db.users.delete_one({"_id": ObjectId(request.form["id"])})
+    if request.form["amount"] and request.form["category"] and request.form["date"]:
+        db.users.update_one({"_id": ObjectId(request.form["id"])}, {
+            "$pull": {
+                "expenses": {
+                    "amount": request.form["amount"],
+                    "category": request.form["category"],
+                    "date": request.form["date"],
+                }
+            }
+        })
+    else:
+        db.users.delete_one({"_id": ObjectId(request.form["id"])})
 
     return redirect("/admin")
 
@@ -281,6 +308,7 @@ def get_all_users_admin():
             "last_name": user["last_name"],
             "family_role": user["family"]["role"],
             "family_name": user["family"]["name"],
+            "expenses": user["expenses"]
         })
 
     return jsonify(users)

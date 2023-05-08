@@ -25,16 +25,31 @@
 
 {% block content %}
 <div class="container">
-  <table class="table">
+  <table class="table mb-5" id="users">
     <thead>
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Family Role</th>
-        <th scope="col">Family Name</th>
-        <th scope="col"></th>
+        <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">First Name</th>
+        <th scope="col" class="text-center">Last Name</th>
+        <th scope="col" class="text-center">Email</th>
+        <th scope="col" class="text-center">Family Role</th>
+        <th scope="col" class="text-center">Family Name</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <table class="table mt-5" id="expenses">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">First Name</th>
+        <th scope="col" class="text-center">Last Name</th>
+        <th scope="col" class="text-center">Category</th>
+        <th scope="col" class="text-center">Amount</th>
+        <th scope="col" class="text-center">Date</th>
+        <th scope="col" class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody></tbody>

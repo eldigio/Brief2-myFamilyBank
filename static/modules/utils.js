@@ -270,7 +270,7 @@ export const getUsersChartDataset = (jsonData, year, month) => {
     [...user.expenses].forEach((expense) => {
       const expenseYear = expense.date.split('-')[0] * 1;
       const expenseMonth = expense.date.split('-')[1] * 1;
-      const expenseDay = expense.date.split('-')[2] * 1;
+      const expenseDay = expense.date.split('-')[2].slice(0, 2) * 1;
       if (month === expenseMonth && year === expenseYear) {
         amounts[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
         categories[index].data.length = getAllDaysInMonth(expenseYear, expenseMonth).length;
@@ -383,8 +383,6 @@ export const createChart = (jsonData, session, type) => {
 
   return chart;
 };
-
-export const loadAnimationSignUp = (tl) => {};
 
 export const loadAnimation = async (tl, name) => {
   switch (name) {
@@ -504,101 +502,168 @@ export const isAdmin = async (user, passwd) => {
   return json.some((admin) => admin.user === user && admin.passwd === passwd);
 };
 
-export const createTableRow = (user) => {
+export const createTableRow = (user, type) => {
   const tr = document.createElement('tr');
   const tdId = document.createElement('td');
-  tdId.insertAdjacentHTML(
-    'afterbegin',
-    `<input type="text" class="form-control-plaintext text-truncate" name="id" value="${user.id}" readonly />`
-  );
-  tdId.style.maxWidth = '8ch';
-  tdId.id = 'id';
   const tdFirstName = document.createElement('td');
-  tdFirstName.insertAdjacentHTML(
-    'afterbegin',
-    `<input type="text" class="form-control text-truncate" name="first_name" value="${user.first_name}" disabled />`
-  );
-  tdFirstName.style.maxWidth = '10ch';
-  tdFirstName.id = 'firstName';
   const tdLastName = document.createElement('td');
-  tdLastName.insertAdjacentHTML(
-    'afterbegin',
-    `<input type="text" class="form-control text-truncate" name="last_name" value="${user.last_name}" disabled />`
-  );
-  tdLastName.style.maxWidth = '10ch';
-  tdLastName.id = 'lastName';
-  const tdEmail = document.createElement('td');
-  tdEmail.insertAdjacentHTML(
-    'afterbegin',
-    `<input type="text" class="form-control-plaintext text-truncate" name="email" value="${user.email}" readonly />`
-  );
-  tdEmail.style.maxWidth = '16ch';
-  tdEmail.id = 'email';
-  const tdFamilyRole = document.createElement('td');
-  tdFamilyRole.insertAdjacentHTML(
-    'afterbegin',
-    `
+  const tdActions = document.createElement('td');
+
+  switch (type) {
+    case 'users':
+      const tdEmail = document.createElement('td');
+      const tdFamilyRole = document.createElement('td');
+      const tdFamilyName = document.createElement('td');
+      tdId.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control-plaintext text-truncate" name="id" value="${user.id}" readonly />`
+      );
+      tdId.style.maxWidth = '8ch';
+      tdId.id = 'id';
+      tdFirstName.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="first_name" value="${user.first_name}" disabled />`
+      );
+      tdFirstName.style.maxWidth = '10ch';
+      tdFirstName.id = 'firstName';
+      tdLastName.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="last_name" value="${user.last_name}" disabled />`
+      );
+      tdLastName.style.maxWidth = '10ch';
+      tdLastName.id = 'lastName';
+      tdEmail.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control-plaintext text-truncate" name="email" value="${user.email}" readonly />`
+      );
+      tdEmail.style.maxWidth = '16ch';
+      tdEmail.id = 'email';
+      tdFamilyRole.insertAdjacentHTML(
+        'afterbegin',
+        `
     <select type="text" class="form-select" name="family_role" disabled>
       <option value="head" ${user.family_role === 'head' ? 'selected' : ''}>Head</option>
       <option value="member" ${user.family_role === 'member' ? 'selected' : ''}>Member</option>
     </select>`
-  );
-  tdFamilyRole.id = 'familyRole';
-  const tdFamilyName = document.createElement('td');
-  tdFamilyName.insertAdjacentHTML(
-    'afterbegin',
-    `<input type="text" class="form-control text-truncate" name="family_name" value="${user.family_name}" disabled />`
-  );
-  tdFamilyName.style.maxWidth = '8ch';
-  tdFamilyName.id = 'familyName';
-  const tdActions = document.createElement('td');
-  tdActions.insertAdjacentHTML(
-    'afterbegin',
-    `
-    <div class="row gx-3">
-      <div class="col-6">
-        <i class="bi bi-pen btn btn-outline-warning" id="edit"></i>
-      </div>
-      <div class="col-6">
-      <form action="/admin/delete" method="post">
-      <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash3" id="delete"></i></button>
-      <input type="hidden" name="id" value="${user.id}" />
-      </form>
-      </div>
-    </div>
-    `
-  );
-  tdActions.id = 'actions';
+      );
+      tdFamilyRole.id = 'familyRole';
+      tdFamilyName.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="family_name" value="${user.family_name}" disabled />`
+      );
+      tdFamilyName.style.maxWidth = '8ch';
+      tdFamilyName.id = 'familyName';
+      tdActions.insertAdjacentHTML(
+        'afterbegin',
+        `
+        <div class="row gx-3">
+          <div class="col-6 d-flex justify-content-end">
+            <i class="bi bi-pen btn btn-outline-warning" id="edit"></i>
+          </div>
+          <div class="col-6 d-flex justify-content-center">
+          <form action="/admin/delete" method="post" id="delete">
+            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash3"></i></button>
+            <input type="hidden" name="id" value="${user.id}" />
+          </form>
+          </div>
+        </div>
+        `
+      );
+      tdActions.id = 'actions';
 
-  tr.append(tdId, tdFirstName, tdLastName, tdEmail, tdFamilyRole, tdFamilyName, tdActions);
-
+      tr.append(tdId, tdFirstName, tdLastName, tdEmail, tdFamilyRole, tdFamilyName, tdActions);
+      break;
+    case 'expenses':
+      const tdCategory = document.createElement('td');
+      const tdAmounts = document.createElement('td');
+      const tdDate = document.createElement('td');
+      tdId.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control-plaintext text-truncate" name="id" value="${user.id}" readonly />`
+      );
+      tdId.style.maxWidth = '8ch';
+      tdId.id = 'id';
+      tdFirstName.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="first_name" value="${user.first_name}" disabled />`
+      );
+      tdFirstName.style.maxWidth = '10ch';
+      tdFirstName.id = 'firstName';
+      tdLastName.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="last_name" value="${user.last_name}" disabled />`
+      );
+      tdLastName.style.maxWidth = '10ch';
+      tdLastName.id = 'lastName';
+      tdCategory.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="text" class="form-control text-truncate" name="category" value="${user.category}" disabled />`
+      );
+      tdCategory.style.maxWidth = '8ch';
+      tdCategory.id = 'category';
+      tdAmounts.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="number" class="form-control text-truncate" name="amounts" value="${user.amount}" disabled />`
+      );
+      tdAmounts.style.maxWidth = '8ch';
+      tdAmounts.id = 'amounts';
+      tdDate.insertAdjacentHTML(
+        'afterbegin',
+        `<input type="datetime-local" class="form-control text-truncate" name="date" value="${user.date}" disabled />`
+      );
+      tdDate.style.maxWidth = '19ch';
+      tdDate.id = 'date';
+      tdActions.insertAdjacentHTML(
+        'afterbegin',
+        `
+        <div class="row gx-3">
+          <div class="col-6 d-flex justify-content-end">
+            <i class="bi bi-pen btn btn-outline-warning" id="edit"></i>
+          </div>
+          <div class="col-6 d-flex justify-content-center">
+          <form action="/admin/delete" method="post" id="delete">
+            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash3"></i></button>
+            <input type="hidden" name="id" value="${user.id}" />
+            <input type="hidden" name="category" value="${user.category}" />
+            <input type="hidden" name="amount" value="${user.amount}" />
+            <input type="hidden" name="date" value="${user.date}" />
+          </form>
+          </div>
+        </div>
+        `
+      );
+      tdActions.id = 'actions';
+      tr.append(tdId, tdFirstName, tdLastName, tdCategory, tdAmounts, tdDate, tdActions);
+      break;
+  }
   return tr;
 };
 
-export const createTable = (json, tbody) => {
-  document.querySelector('tbody').innerHTML = '';
-  json.forEach((user) => {
-    const tr = createTableRow(user);
+export const createTable = (users, tbody, type) => {
+  tbody.innerHTML = '';
+  users.forEach((user) => {
+    const tr = createTableRow(user, type);
     tbody.appendChild(tr);
   });
 };
 
-export const toggleDisabledInput = (tr, type, json, tbody) => {
+export const toggleDisabledInput = (tr, type, table) => {
   switch (type) {
     case 'edit':
-      tr.cells.firstName.firstChild.toggleAttribute('disabled');
-      tr.cells.lastName.firstChild.toggleAttribute('disabled');
-      tr.cells.familyRole.children[0].toggleAttribute('disabled');
-      tr.cells.familyName.firstChild.toggleAttribute('disabled');
-      tr.cells.actions.querySelector('#edit').remove();
-      tr.cells.actions.firstElementChild.firstElementChild.insertAdjacentHTML(
-        'afterbegin',
-        `<i class="bi bi-x-lg btn btn-outline-secondary" id="cancel"></i>`
-      );
-      tr.cells.actions.querySelector('#delete').remove();
-      tr.cells.actions.firstElementChild.lastElementChild.insertAdjacentHTML(
-        'afterbegin',
-        `
+      if (table.id === 'users') {
+        tr.cells.firstName.firstChild.toggleAttribute('disabled');
+        tr.cells.lastName.firstChild.toggleAttribute('disabled');
+        tr.cells.familyRole.children[0].toggleAttribute('disabled');
+        tr.cells.familyName.firstChild.toggleAttribute('disabled');
+        tr.cells.actions.querySelector('#edit').remove();
+        tr.cells.actions.firstElementChild.firstElementChild.insertAdjacentHTML(
+          'afterbegin',
+          `<i class="bi bi-x-lg btn btn-outline-secondary" id="cancel"></i>`
+        );
+        tr.cells.actions.querySelector('#delete').remove();
+        tr.cells.actions.firstElementChild.lastElementChild.insertAdjacentHTML(
+          'afterbegin',
+          `
         <form action="/admin" method="post">
           <button type="submit" class="btn btn-outline-primary"><i class="bi bi-check-lg" id="save"></i></button>
           <input type="hidden" name="id" value="${tr.cells.id.firstChild.value}" />
@@ -610,10 +675,40 @@ export const toggleDisabledInput = (tr, type, json, tbody) => {
           <input type="hidden" name="family_name" value="${tr.cells.familyName.firstChild.value}" />
         </form>
         `
-      );
+        );
+      }
+      if (table.id === 'expenses') {
+        tr.cells.firstName.firstChild.toggleAttribute('disabled');
+        tr.cells.lastName.firstChild.toggleAttribute('disabled');
+        tr.cells.category.firstChild.toggleAttribute('disabled');
+        tr.cells.amounts.firstChild.toggleAttribute('disabled');
+        tr.cells.date.firstChild.toggleAttribute('disabled');
+        tr.cells.actions.querySelector('#edit').remove();
+        tr.cells.actions.firstElementChild.firstElementChild.insertAdjacentHTML(
+          'afterbegin',
+          `<i class="bi bi-x-lg btn btn-outline-secondary" id="cancel"></i>`
+        );
+        tr.cells.actions.querySelector('#delete').remove();
+        tr.cells.actions.firstElementChild.lastElementChild.insertAdjacentHTML(
+          'afterbegin',
+          `
+        <form action="/admin" method="post">
+          <button type="submit" class="btn btn-outline-primary"><i class="bi bi-check-lg" id="save"></i></button>
+          <input type="hidden" name="id" value="${tr.cells.id.firstChild.value}" />
+          <input type="hidden" name="first_name" value="${tr.cells.firstName.firstChild.value}" />
+          <input type="hidden" name="last_name" value="${tr.cells.lastName.firstChild.value}" />
+          <input type="hidden" name="old_amount" value="${tr.cells.amounts.firstChild.value}" />
+          <input type="hidden" name="amount" value="${tr.cells.amounts.firstChild.value}" />
+          <input type="hidden" name="old_category" value="${tr.cells.category.firstChild.value}" />
+          <input type="hidden" name="category" value="${tr.cells.category.firstChild.value}" />
+          <input type="hidden" name="old_date" value="${tr.cells.date.firstChild.value}" />
+          <input type="hidden" name="date" value="${tr.cells.date.firstChild.value}" />
+        </form>
+        `
+        );
+      }
       break;
     case 'cancel':
-      createTable(json, tbody);
       break;
   }
 };

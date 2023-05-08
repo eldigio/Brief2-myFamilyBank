@@ -12,6 +12,7 @@ const fetchData = async () => {
   const response = await fetch(`http://127.0.0.1:5000/profile/family/${session.familyName}`);
   const jsonData = Object.values(await response.json());
 
+  // console.log(jsonData);
   await loadAnimation(tl, 'dashboard');
 
   const chart = createChart(jsonData, session, 'bar');

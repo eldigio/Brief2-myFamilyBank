@@ -5,7 +5,7 @@ import { getSession, insertSessionData, loadAnimation, setNavData } from './modu
 gsap.registerPlugin(ScrollTrigger);
 const tl = gsap.timeline({ defaults: { duration: 0.4, opacity: 0, ease: 'power4.out', scale: 0.75 } });
 
-document.querySelector('input[type="date"]').valueAsDate = new Date();
+document.querySelector('input[type="datetime-local"]').value = new Date().toISOString().slice(0, 16);
 
 const session = getSession();
 setNavData(session);
